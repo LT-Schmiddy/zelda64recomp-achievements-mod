@@ -15,15 +15,15 @@ NATIVE_EXTENSION := dll
 else ifneq ($(shell uname),Darwin)
 CC      := clang
 LD      := ld.lld
-NATIVE_TRIPLET := native-macos-x64
-NATIVE_SUBDIR := lib
-NATIVE_EXTENSION := dylib
-else
-CC      ?= clang
-LD      ?= ld.lld
 NATIVE_TRIPLET := native-linux-x64
 NATIVE_SUBDIR := lib
 NATIVE_EXTENSION := so
+else
+CC      ?= clang
+LD      ?= ld.lld
+NATIVE_TRIPLET := native-macos-x64
+NATIVE_SUBDIR := lib
+NATIVE_EXTENSION := dylib
 endif
 
 # Extlib Building Info:
