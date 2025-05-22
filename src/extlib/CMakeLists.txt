@@ -1,3 +1,3 @@
-target_sources(${SHIM_TOOL_NAME} PUBLIC
+target_sources(${TARGET_NAME} PUBLIC
     "main.cpp"
 )
