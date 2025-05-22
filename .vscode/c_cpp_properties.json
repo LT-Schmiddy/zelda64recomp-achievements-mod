@@ -1,10 +1,11 @@
 {
     "configurations": [
         {
-            "name": "Mod",
+            "name": "Combined",
             "includePath": [
-                "${workspaceFolder}/include",
-                "${workspaceFolder}/include/dummy_headers",
+                "${workspaceFolder}/include/mod/",
+                "${workspaceFolder}/include/mod/dummy_headers",
+                "${workspaceFolder}/include/extlib",
                 "${workspaceFolder}/mm-decomp/include",
                 "${workspaceFolder}/mm-decomp/src",
                 "${workspaceFolder}/assets_extracted",
@@ -19,6 +20,45 @@
             "compilerPath": "clang",
             "cStandard": "c99",
             "intelliSenseMode": "clang-x86"
+        },
+        {
+            "name": "Mod_Only",
+            "includePath": [
+                "${workspaceFolder}/include/mod/",
+                "${workspaceFolder}/include/mod/dummy_headers",
+                "${workspaceFolder}/include/lib",
+                "${workspaceFolder}/mm-decomp/include",
+                "${workspaceFolder}/mm-decomp/src",
+                "${workspaceFolder}/assets_extracted",
+                "${workspaceFolder}/assets_extracted/assets",
+                "${workspaceFolder}/mm-decomp/extracted/n64-us"
+            ],
+            "defines": [
+                "F3DEX_GBI_2",
+                "_LANGUAGE_C",
+                "MIPS"
+            ],
+            "compilerPath": "clang",
+            "cStandard": "c99",
+            "intelliSenseMode": "clang-x86"
+        },
+        {
+            "name": "Lib_Win32_Only",
+            "includePath": [
+                "${workspaceFolder}/include/extlib"
+            ]
+        },
+        {
+            "name": "Lib_Mac_Only",
+            "includePath": [
+                "${workspaceFolder}/include/extlib"
+            ]
+        },
+        {
+            "name": "Lib_Linux_Only",
+            "includePath": [
+                "${workspaceFolder}/include/extlib"
+            ]
         }
     ],
     "version": 4
