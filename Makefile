@@ -1,6 +1,7 @@
 BUILD_DIR := build
-MOD_TOML ?= ./mod.toml
-LIB_NAME ?= librecomp_achievements_lib
+MOD_TOML := ./mod.toml
+LIB_NAME := recomp_achievements_lib
+LIB_PREFIX := lib
 ASSETS_EXTRACTED_DIR ?= assets_extracted
 ASSETS_INCLUDE_DIR ?= assets_extracted/assets
 # Allow the user to specify the compiler and linker on macOS
@@ -8,15 +9,21 @@ ASSETS_INCLUDE_DIR ?= assets_extracted/assets
 ifeq ($(OS),Windows_NT)
 CC      := clang
 LD      := ld.lld
-NATIVE_TRIPLET ?= native-windows-x64
+NATIVE_TRIPLET := native-windows-x64
+NATIVE_SUBDIR := bin
+NATIVE_EXTENSION := dll
 else ifneq ($(shell uname),Darwin)
 CC      := clang
 LD      := ld.lld
-NATIVE_TRIPLET ?= native-macos-x64
+NATIVE_TRIPLET := native-macos-x64
+NATIVE_SUBDIR := lib
+NATIVE_EXTENSION := dylib
 else
 CC      ?= clang
 LD      ?= ld.lld
-NATIVE_TRIPLET ?= native-linux-x64
+NATIVE_TRIPLET := native-linux-x64
+NATIVE_SUBDIR := lib
+NATIVE_EXTENSION := so
 endif
 
 # Extlib Building Info:
@@ -27,12 +34,17 @@ ZIG_MACOS_TRIPLET ?= zig-macos-aarch64
 ZIG_LINUX_TRIPLET ?= zig-linux-x64
 
 define extlib_build_file
+$(BUILD_DIR)/$(1)-$(2)/$(3)/$(LIB_PREFIX)$(LIB_NAME).$(4)
+endef
+
+define native_extlib_build_file
 $(BUILD_DIR)/$(1)-$(2)/$(3)/$(LIB_NAME).$(4)
 endef
 
 LIB_BUILD_WIN := $(call extlib_build_file,$(ZIG_WINDOWS_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),bin,dll)
 LIB_BUILD_MACOS := $(call extlib_build_file,$(ZIG_MACOS_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),lib,dylib)
 LIB_BUILD_LINUX := $(call extlib_build_file,$(ZIG_LINUX_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),lib,so)
+LIB_BUILD_NATIVE := $(call native_extlib_build_file,$(NATIVE_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),$(NATIVE_SUBDIR),$(NATIVE_EXTENSION))
 
 # Python Info:
 ifeq ($(OS),Windows_NT)
@@ -43,15 +55,15 @@ endif
 
 PYTHON_FUNC_MODULE := make_python_functions
 define call_python_func
-	$(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); $(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\").$(1)($(2))"
+	$(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); $(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\", \"$(LIB_BUILD_NATIVE)\").$(1)($(2))"
 endef
 
 define get_python_func
-$(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); $(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\").$(1)($(2))")
+$(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); $(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\", \"$(LIB_BUILD_NATIVE)\").$(1)($(2))")
 endef
 
 define get_python_val
-$(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); print($(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\").$(1))")
+$(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); print($(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\", \"$(LIB_BUILD_NATIVE)\").$(1))")
 endef
 
 # Recomp Tools Building Info:
@@ -87,6 +99,14 @@ C_DEPS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.d))
 
 # General Recipes:
 all: nrm extlib-all runtime
+
+native: nrm extlib-native runtime
+
+windows: nrm extlib-win runtime
+
+macos: nrm extlib-macos runtime
+
+linux: nrm extlib-linux runtime
 
 runtime:
 	$(call call_python_func,copy_to_runtime_dir,)
@@ -140,6 +160,10 @@ extlib-macos:
 extlib-linux:
 	cmake --preset=$(ZIG_LINUX_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
 	cmake --build --preset=$(ZIG_LINUX_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
+
+extlib-native:
+	cmake --preset=$(NATIVE_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
+	cmake --build --preset=$(NATIVE_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
 
 # Misc Recipes:
 clean:
