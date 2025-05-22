@@ -7,7 +7,7 @@ class ModInfo:
     mod_toml_file: Path
     mod_data: dict
     
-    def __init__(self, mod_toml_str: str, build_dir: str, lib_name: str):
+    def __init__(self, mod_toml_str: str, build_dir: str, windows_lib: str, macos_lib: str, linux_lib: str):
         self.project_root = Path(__file__).parent
         self.mod_toml_file = self.project_root.joinpath(mod_toml_str)
         
@@ -16,25 +16,25 @@ class ModInfo:
         self.build_dir = self.project_root.joinpath(build_dir)
         self.build_nrm_file = self.build_dir.joinpath(f"{self.mod_data['inputs']['mod_filename']}.nrm")
         
-        self.build_dll_file = self.build_dir.joinpath(f"{lib_name}.dll")
-        self.build_pdb_file = self.build_dir.joinpath(f"{lib_name}.pdb")
-        self.build_dylib_file = self.build_dir.joinpath(f"{lib_name}.dylib")
-        self.build_so_file = self.build_dir.joinpath(f"{lib_name}.so")
-
         self.runtime_mods_dir = self.project_root.joinpath("runtime/mods")
         self.runtime_nrm_file = self.runtime_mods_dir.joinpath(f"{self.mod_data['inputs']['mod_filename']}.nrm")
         
-        self.runtime_dll_file = self.runtime_mods_dir.joinpath(f"{lib_name}.dll")
-        self.runtime_pdb_file = self.runtime_mods_dir.joinpath(f"{lib_name}.pdb")
-        self.runtime_dylib_file = self.runtime_mods_dir.joinpath(f"{lib_name}.dylib")
-        self.runtime_so_file = self.runtime_mods_dir.joinpath(f"{lib_name}.so")
+        self.build_dll_file = self.project_root.joinpath(windows_lib)
+        self.build_pdb_file = self.build_dll_file.with_suffix(".pdb")
+        self.build_dylib_file = self.project_root.joinpath(macos_lib)
+        self.build_so_file = self.project_root.joinpath(linux_lib)
+        
+        self.runtime_dll_file = self.runtime_mods_dir.joinpath(self.build_dll_file.name)
+        self.runtime_pdb_file = self.runtime_mods_dir.joinpath(self.build_pdb_file.name)
+        self.runtime_dylib_file = self.runtime_mods_dir.joinpath(self.build_dylib_file.name)
+        self.runtime_so_file = self.runtime_mods_dir.joinpath(self.build_so_file.name)
         
         self.assets_archive_path =self.project_root.joinpath("assets_archive.zip")
 
     def get_mod_file(self):
         # print(f"{self.mod_data['inputs']['mod_filename']}.nrm")
         name = f"{self.mod_data['inputs']['mod_filename']}.nrm"
-        print(self.mod_toml_file.parent.joinpath(name))
+        print(self.build_dir.joinpath(name))
     
     def get_mod_elf(self):
         print(self.mod_toml_file.parent.joinpath(self.mod_data['inputs']['elf_path']))
@@ -46,30 +46,28 @@ class ModInfo:
                 zip_ref.extractall(assets_extract_path)
 
     def copy_to_runtime_dir(self):
+
+        
         # Copying files for debugging:
         os.makedirs(self.runtime_mods_dir, exist_ok=True)
         shutil.copy(self.build_nrm_file, self.runtime_nrm_file)
-        # shutil.copy(self.build_dll_file, self.runtime_dll_file)
-        # shutil.copy(self.build_pdb_file, self.runtime_pdb_file)
-        # shutil.copy(self.build_dylib_file, self.runtime_dylib_file)
-        # shutil.copy(self.build_so_file, self.runtime_so_file)
+        shutil.copy(self.build_dll_file, self.runtime_dll_file)
+        shutil.copy(self.build_pdb_file, self.runtime_pdb_file)
+        shutil.copy(self.build_dylib_file, self.runtime_dylib_file)
+        shutil.copy(self.build_so_file, self.runtime_so_file)
 
     def run_clean(self):
         shutil.rmtree(self.build_dir)
         shutil.rmtree(self.project_root.joinpath("./N64Recomp/build"))
 
-    
-    def run_build(self):
-        # Unzipping Archive:
-        make_run = subprocess.run(
-            [
-                shutil.which("make"),
-            ],
-            cwd=pathlib.Path(__file__).parent
-        )
-        if make_run.returncode != 0:
-            raise RuntimeError("Make failed!")
+
 
 if __name__ == '__main__':
-    mod = ModInfo("./mod.toml")
-    mod.run_build()
+    make_run = subprocess.run(
+        [
+            shutil.which("make"),
+        ],
+        cwd=pathlib.Path(__file__).parent
+    )
+    if make_run.returncode != 0:
+        raise RuntimeError("Make failed!")

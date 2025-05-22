@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(TARGET_NAME recomp_achievements_lib)
 
-add_executable(${TARGET_NAME})
+add_library(${TARGET_NAME} SHARED)
 
 add_subdirectory("./src/extlib")
 include_directories("./includes/extlib")

@@ -12,7 +12,7 @@ RECOMP_PATCH s32 Player_CanSpinAttack(Player* this) {
         recomp_printf("string_option: %s\n", string_option);
         recomp_free_config_string(string_option);
     }
-
+    recomp_printf("Hello Alex\n");
     // Always spin attack.
     return true;
 }

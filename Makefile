@@ -1,6 +1,8 @@
 BUILD_DIR := build
 MOD_TOML ?= ./mod.toml
-LIB_NAME ?= lua_host
+LIB_NAME ?= librecomp_achievements_lib
+ASSETS_EXTRACTED_DIR ?= assets_extracted
+ASSETS_INCLUDE_DIR ?= assets_extracted/assets
 # Allow the user to specify the compiler and linker on macOS
 # as Apple Clang does not support MIPS architecture
 ifeq ($(OS),Windows_NT)
@@ -14,6 +16,21 @@ else
     LD      ?= ld.lld
 endif
 
+# Extlib Building Info:
+# (has to be here so python can use it.)
+CMAKE_LIB_BUILD_TYPE ?= Debug
+ZIG_WINDOWS_TRIPLET ?= zig-windows-x64
+ZIG_MACOS_TRIPLET ?= zig-macos-aarch64
+ZIG_LINUX_TRIPLET ?= zig-linux-x64
+
+define extlib_build_file
+$(BUILD_DIR)/$(1)-$(2)/$(3)/$(LIB_NAME).$(4)
+endef
+
+LIB_BUILD_WIN := $(call extlib_build_file,$(ZIG_WINDOWS_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),bin,dll)
+LIB_BUILD_MACOS := $(call extlib_build_file,$(ZIG_MACOS_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),lib,dylib)
+LIB_BUILD_LINUX := $(call extlib_build_file,$(ZIG_LINUX_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),lib,so)
+
 # Python Info:
 ifeq ($(OS),Windows_NT)
 PYTHON_EXEC ?= python
@@ -23,18 +40,30 @@ endif
 
 PYTHON_FUNC_MODULE := make_python_functions
 define call_python_func
-	$(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); $(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_NAME)\").$(1)($(2))"
+	$(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); $(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\").$(1)($(2))"
 endef
+
 define get_python_func
-$(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); $(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_NAME)\").$(1)($(2))")
+$(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); $(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\").$(1)($(2))")
 endef
 
 define get_python_val
-$(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); print($(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_NAME)\").$(1))")
+$(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); print($(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\").$(1))")
 endef
 
-# Mod building info:
-MOD_ELF := $(BUILD_DIR)/mod.elf
+# Recomp Tools Building Info:
+N64RECOMP_DIR := N64Recomp
+N64RECOMP_BUILD_DIR := $(N64RECOMP_DIR)/build
+RECOMP_MOD_TOOL := $(N64RECOMP_BUILD_DIR)/RecompModTool
+OFFLINE_MOD_TOOL := $(N64RECOMP_BUILD_DIR)/OfflineModRecomp
+
+# Mod Building Info:
+
+MOD_FILE := $(call get_python_func,get_mod_file,)
+$(info MOD_FILE = $(MOD_FILE))
+MOD_ELF  := $(call get_python_func,get_mod_elf,)
+$(info MOD_ELF = $(MOD_ELF))
+
 MOD_SYMS := $(BUILD_DIR)/mod_syms.bin
 MOD_BINARY := $(BUILD_DIR)/mod_binary.bin
 ZELDA_SYMS := Zelda64RecompSyms/mm.us.rev1.syms.toml
@@ -53,26 +82,23 @@ C_SRCS := $(wildcard src/mod/*.c)
 C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.o))
 C_DEPS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.d))
 
-# Recomp tools building info:
-N64RECOMP_DIR := N64Recomp
-N64RECOMP_BUILD_DIR := $(N64RECOMP_DIR)/build
-RECOMP_MOD_TOOL := $(N64RECOMP_BUILD_DIR)/RecompModTool
-OFFLINE_MOD_TOOL := $(N64RECOMP_BUILD_DIR)/OfflineModRecomp
+all: nrm-runtime
 
-# Extlib building info:
-nrm_runtime: nrm
+# Mod Recipes:
+nrm-runtime: nrm extlib-all
 	$(call call_python_func,copy_to_runtime_dir,)
 
-# Recipes:
-nrm: $(MOD_ELF) $(RECOMP_MOD_TOOL)
+nrm: $(MOD_FILE)
+
+$(MOD_FILE): $(MOD_ELF) $(RECOMP_MOD_TOOL)
 	$(RECOMP_MOD_TOOL) mod.toml $(BUILD_DIR)
 
 offline: nrm
 	$(OFFLINE_MOD_TOOL) $(MOD_SYMS) $(MOD_BINARY) $(ZELDA_SYMS) $(OFFLINE_C_OUTPUT)
 
-elf: $(MOD_ELF)
+elf: $(MOD_ELF) 
 
-$(MOD_ELF): $(C_OBJS) $(LDSCRIPT) | $(BUILD_DIR)
+$(MOD_ELF): $(C_OBJS) $(LDSCRIPT) | $(BUILD_DIR) $(ASSETS_INCLUDE_DIR)
 	$(LD) $(C_OBJS) $(LDFLAGS) -o $@
 
 $(BUILD_DIR) $(BUILD_DIR)/src $(BUILD_DIR)/src/mod $(N64RECOMP_BUILD_DIR):
@@ -82,22 +108,47 @@ else
 	mkdir -p $@
 endif
 
+$(C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIR) $(BUILD_DIR)/src/mod $(ASSETS_INCLUDE_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $< -MMD -MF $(@:.o=.d) -c -o $@
+
+$(ASSETS_INCLUDE_DIR):
+	$(call call_python_func,create_asset_archive,\"$(ASSETS_INCLUDE_DIR)\")
+
+# Recomp Tools Recipes:
 $(RECOMP_MOD_TOOL): $(N64RECOMP_BUILD_DIR) 
 	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S $(N64RECOMP_DIR) -B $(N64RECOMP_BUILD_DIR)
 	cmake --build $(N64RECOMP_BUILD_DIR)
 
-$(C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIR) $(BUILD_DIR)/src/mod
-	$(CC) $(CFLAGS) $(CPPFLAGS) $< -MMD -MF $(@:.o=.d) -c -o $@
+# Extlib Recipes:
+extlib-all: $(LIB_BUILD_WIN) $(LIB_BUILD_MACOS) $(LIB_BUILD_LINUX)
 
+extlib-win: $(LIB_BUILD_WIN)
+$(LIB_BUILD_WIN):
+	cmake --preset=$(ZIG_WINDOWS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
+	cmake --build --preset=$(ZIG_WINDOWS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
+
+extlib-macos: $(LIB_BUILD_MACOS)
+$(LIB_BUILD_MACOS):
+	cmake --preset=$(ZIG_MACOS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
+	cmake --build --preset=$(ZIG_MACOS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
+
+extlib-linux: $(LIB_BUILD_LINUX)
+$(LIB_BUILD_LINUX):
+	cmake --preset=$(ZIG_LINUX_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
+	cmake --build --preset=$(ZIG_LINUX_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
+
+# Misc Recipes:
 clean:
 ifeq ($(OS),Windows_NT)
-	rmdir "$(BUILD_DIR)" /s /q
-	rmdir "$(N64RECOMP_BUILD_DIR)" /s /q
+	- rmdir "$(BUILD_DIR)" /s /q
+	- rmdir "$(N64RECOMP_BUILD_DIR)" /s /q
+	- rmdir "$(ASSETS_EXTRACTED_DIR)" /s /q
 else
-	rm -rf $(BUILD_DIR)
-	rm -rf $(N64RECOMP_BUILD_DIR)
+	- rm -rf $(BUILD_DIR)
+	- rm -rf $(N64RECOMP_BUILD_DIR)
+	- rm -rf $(ASSETS_EXTRACTED_DIR)
 endif
 
 -include $(C_DEPS)
 
-.PHONY: clean nrm offline
+.PHONY: all nrm nrm-runtime offline extlib-all extlib-win extlib-macos extlib-linux clean
