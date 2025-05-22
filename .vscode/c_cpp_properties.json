@@ -8,6 +8,7 @@
                 "${workspaceFolder}/include/extlib",
                 "${workspaceFolder}/mm-decomp/include",
                 "${workspaceFolder}/mm-decomp/src",
+                "${workspaceFolder}/offline_build",
                 "${workspaceFolder}/assets_extracted",
                 "${workspaceFolder}/assets_extracted/assets",
                 "${workspaceFolder}/mm-decomp/extracted/n64-us"
@@ -45,19 +46,22 @@
         {
             "name": "Lib_Win32_Only",
             "includePath": [
-                "${workspaceFolder}/include/extlib"
+                "${workspaceFolder}/include/extlib",
+                "${workspaceFolder}/offline_build"
             ]
         },
         {
             "name": "Lib_Mac_Only",
             "includePath": [
-                "${workspaceFolder}/include/extlib"
+                "${workspaceFolder}/include/extlib",
+                "${workspaceFolder}/offline_build"
             ]
         },
         {
             "name": "Lib_Linux_Only",
             "includePath": [
-                "${workspaceFolder}/include/extlib"
+                "${workspaceFolder}/include/extlib",
+                "${workspaceFolder}/offline_build"
             ]
         }
     ],

@@ -16,7 +16,8 @@ class ModInfo:
         self.build_dir = self.project_root.joinpath(build_dir)
         self.build_nrm_file = self.build_dir.joinpath(f"{self.mod_data['inputs']['mod_filename']}.nrm")
         
-        self.runtime_mods_dir = self.project_root.joinpath("runtime/mods")
+        self.runtime_dir = self.project_root.joinpath("runtime")
+        self.runtime_mods_dir = self.runtime_dir.joinpath("mods")
         self.runtime_nrm_file = self.runtime_mods_dir.joinpath(f"{self.mod_data['inputs']['mod_filename']}.nrm")
         
         self.build_dll_file = self.project_root.joinpath(windows_lib)
@@ -51,6 +52,11 @@ class ModInfo:
 
         # Copying files for debugging:
         os.makedirs(self.runtime_mods_dir, exist_ok=True)
+        portable_txt = self.runtime_dir.joinpath("portable.txt")
+        if not portable_txt.exists():
+            portable_txt.write_text("")
+            print(f"Created '{portable_txt}'.")
+        
         self.copy_if_exists(self.build_nrm_file, self.runtime_nrm_file)
         self.copy_if_exists(self.build_dll_file, self.runtime_dll_file)
         self.copy_if_exists(self.build_pdb_file, self.runtime_pdb_file)
@@ -70,13 +76,16 @@ class ModInfo:
         shutil.rmtree(self.project_root.joinpath("./N64Recomp/build"))
 
 
-
-if __name__ == '__main__':
+def run_build(args: list[str]):
     make_run = subprocess.run(
         [
             shutil.which("make"),
-        ],
+        ] + args,
         cwd=pathlib.Path(__file__).parent
+        
     )
     if make_run.returncode != 0:
         raise RuntimeError("Make failed!")
+
+if __name__ == '__main__':
+    run_build(sys.argv[1:])

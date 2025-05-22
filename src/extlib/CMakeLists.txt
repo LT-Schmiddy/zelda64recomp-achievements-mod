@@ -1,3 +1,4 @@
 target_sources(${TARGET_NAME} PUBLIC
-    "main.cpp"
+    "lib_main.cpp"
+    "sqlite3.c"
 )

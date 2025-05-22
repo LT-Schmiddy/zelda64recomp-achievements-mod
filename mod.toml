@@ -25,7 +25,7 @@ For more details, see https://github.com/Zelda64Recomp/MMRecompModTemplate."""
 short_description = "Always perform a quickspin when swinging your sword."
 
 # Authors of this mod.
-authors = [ "Your name here" ]
+authors = [ "LT_Schmiddy", "Hyped" ]
 
 # ID of the target recomp game.
 game_id = "mm"
@@ -42,7 +42,7 @@ dependencies = [
 # Native libraries (e.g. DLLs) and the functions they export.
 native_libraries = [
 # Example native library:
-#    { name = "my_native_library", funcs = ["my_native_library_function"] }
+   { name = "recomp_achievements_lib", funcs = ["test_func"] }
 ]
 
 # Inputs to the mod tool.

@@ -179,4 +179,4 @@ endif
 
 -include $(C_DEPS)
 
-.PHONY: all runtime nrm offline extlib-all extlib-win extlib-macos extlib-linux clean
+.PHONY: all runtime nrm native offline extlib-all extlib-win extlib-macos extlib-linux extlib-native clean

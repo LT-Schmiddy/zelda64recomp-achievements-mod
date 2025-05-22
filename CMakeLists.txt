@@ -6,10 +6,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(TARGET_NAME recomp_achievements_lib)
 
+include_directories("./offline_build")
+include_directories("./include/extlib")
+
 add_library(${TARGET_NAME} SHARED)
 
 add_subdirectory("./src/extlib")
-include_directories("./includes/extlib")
 
 set_target_properties(${TARGET_NAME}
     PROPERTIES
