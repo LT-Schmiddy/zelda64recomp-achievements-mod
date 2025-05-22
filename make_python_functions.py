@@ -47,14 +47,20 @@ class ModInfo:
 
     def copy_to_runtime_dir(self):
 
-        
         # Copying files for debugging:
         os.makedirs(self.runtime_mods_dir, exist_ok=True)
-        shutil.copy(self.build_nrm_file, self.runtime_nrm_file)
-        shutil.copy(self.build_dll_file, self.runtime_dll_file)
-        shutil.copy(self.build_pdb_file, self.runtime_pdb_file)
-        shutil.copy(self.build_dylib_file, self.runtime_dylib_file)
-        shutil.copy(self.build_so_file, self.runtime_so_file)
+        self.copy_if_exists(self.build_nrm_file, self.runtime_nrm_file)
+        self.copy_if_exists(self.build_dll_file, self.runtime_dll_file)
+        self.copy_if_exists(self.build_pdb_file, self.runtime_pdb_file)
+        self.copy_if_exists(self.build_dylib_file, self.runtime_dylib_file)
+        self.copy_if_exists(self.build_so_file, self.runtime_so_file)
+
+    def copy_if_exists(self, src: Path, dest: Path):
+        if src.exists():
+            shutil.copy(src, dest)
+            print(f"'{src}' copied to '{dest}'.")
+        else:
+            print(f"'{src}' does not exist. Skipping.")
 
     def run_clean(self):
         shutil.rmtree(self.build_dir)

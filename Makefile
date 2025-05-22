@@ -6,14 +6,17 @@ ASSETS_INCLUDE_DIR ?= assets_extracted/assets
 # Allow the user to specify the compiler and linker on macOS
 # as Apple Clang does not support MIPS architecture
 ifeq ($(OS),Windows_NT)
-    CC      := clang
-    LD      := ld.lld
+CC      := clang
+LD      := ld.lld
+NATIVE_TRIPLET ?= native-windows-x64
 else ifneq ($(shell uname),Darwin)
-    CC      := clang
-    LD      := ld.lld
+CC      := clang
+LD      := ld.lld
+NATIVE_TRIPLET ?= native-macos-x64
 else
-    CC      ?= clang
-    LD      ?= ld.lld
+CC      ?= clang
+LD      ?= ld.lld
+NATIVE_TRIPLET ?= native-linux-x64
 endif
 
 # Extlib Building Info:
@@ -82,15 +85,16 @@ C_SRCS := $(wildcard src/mod/*.c)
 C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.o))
 C_DEPS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.d))
 
-all: nrm-runtime extlib-all
+# General Recipes:
+all: nrm extlib-all runtime
 
-# Mod Recipes:
-nrm-runtime: nrm extlib-all
+runtime:
 	$(call call_python_func,copy_to_runtime_dir,)
 
+# Mod Recipes:
 nrm: $(MOD_FILE)
 
-$(MOD_FILE): $(MOD_ELF) $(RECOMP_MOD_TOOL)
+$(MOD_FILE): $(RECOMP_MOD_TOOL) $(MOD_ELF) 
 	$(RECOMP_MOD_TOOL) mod.toml $(BUILD_DIR)
 
 offline: nrm
@@ -123,7 +127,7 @@ $(RECOMP_MOD_TOOL): $(N64RECOMP_BUILD_DIR)
 extlib-all: extlib-win extlib-macos extlib-linux
 
 # extlib-win: $(LIB_BUILD_WIN)
-extlib-win::
+extlib-win:
 	cmake --preset=$(ZIG_WINDOWS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
 	cmake --build --preset=$(ZIG_WINDOWS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
 
@@ -151,4 +155,4 @@ endif
 
 -include $(C_DEPS)
 
-.PHONY: all nrm nrm-runtime offline extlib-all extlib-win extlib-macos extlib-linux clean
+.PHONY: all runtime nrm offline extlib-all extlib-win extlib-macos extlib-linux clean
