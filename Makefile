@@ -82,7 +82,7 @@ C_SRCS := $(wildcard src/mod/*.c)
 C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.o))
 C_DEPS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.d))
 
-all: nrm-runtime
+all: nrm-runtime extlib-all
 
 # Mod Recipes:
 nrm-runtime: nrm extlib-all
@@ -120,20 +120,20 @@ $(RECOMP_MOD_TOOL): $(N64RECOMP_BUILD_DIR)
 	cmake --build $(N64RECOMP_BUILD_DIR)
 
 # Extlib Recipes:
-extlib-all: $(LIB_BUILD_WIN) $(LIB_BUILD_MACOS) $(LIB_BUILD_LINUX)
+extlib-all: extlib-win extlib-macos extlib-linux
 
-extlib-win: $(LIB_BUILD_WIN)
-$(LIB_BUILD_WIN):
+# extlib-win: $(LIB_BUILD_WIN)
+extlib-win::
 	cmake --preset=$(ZIG_WINDOWS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
 	cmake --build --preset=$(ZIG_WINDOWS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
 
-extlib-macos: $(LIB_BUILD_MACOS)
-$(LIB_BUILD_MACOS):
+# extlib-macos: $(LIB_BUILD_MACOS)
+extlib-macos:
 	cmake --preset=$(ZIG_MACOS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
 	cmake --build --preset=$(ZIG_MACOS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
 
-extlib-linux: $(LIB_BUILD_LINUX)
-$(LIB_BUILD_LINUX):
+# extlib-linux: $(LIB_BUILD_LINUX)
+extlib-linux:
 	cmake --preset=$(ZIG_LINUX_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
 	cmake --build --preset=$(ZIG_LINUX_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
 
