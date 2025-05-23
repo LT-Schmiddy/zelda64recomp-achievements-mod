@@ -6,21 +6,23 @@
 #include "achievements.h"
 
 
-RECOMP_CALLBACK("*", recomp_on_init) void load_lib () {
-    Achievement test[] = { 
+Achievement gAchievements[] = { 
+    {
+        "test_achievement",
+        "Test Achievement",
+        "An achievement for testing.",
+        NULL,
+        0,
+        NULL,
         {
-            "test_achievement",
-            "Test Achievement",
-            "An achievement for testing.",
-            NULL,
-            0,
-            NULL,
-            {
-                0
-            },
-            NULL
-        }
-    };
+            0
+        },
+        NULL
+    }
+};
+
+RECOMP_CALLBACK("*", recomp_on_init) void load_lib () {
+
 
 
 }

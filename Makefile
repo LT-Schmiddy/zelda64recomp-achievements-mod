@@ -4,27 +4,6 @@ LIB_NAME := recomp_achievements_lib
 LIB_PREFIX := lib
 ASSETS_EXTRACTED_DIR ?= assets_extracted
 ASSETS_INCLUDE_DIR ?= assets_extracted/assets
-# Allow the user to specify the compiler and linker on macOS
-# as Apple Clang does not support MIPS architecture
-ifeq ($(OS),Windows_NT)
-CC      := clang
-LD      := ld.lld
-NATIVE_TRIPLET := native-windows-x64
-NATIVE_SUBDIR := bin
-NATIVE_EXTENSION := dll
-else ifneq ($(shell uname),Darwin)
-CC      := clang
-LD      := ld.lld
-NATIVE_TRIPLET := native-linux-x64
-NATIVE_SUBDIR := lib
-NATIVE_EXTENSION := so
-else
-CC      ?= clang
-LD      ?= ld.lld
-NATIVE_TRIPLET := native-macos-x64
-NATIVE_SUBDIR := lib
-NATIVE_EXTENSION := dylib
-endif
 
 # Extlib Building Info:
 # (has to be here so python can use it.)
@@ -65,6 +44,31 @@ endef
 define get_python_val
 $(shell $(PYTHON_EXEC) -c "import $(PYTHON_FUNC_MODULE); print($(PYTHON_FUNC_MODULE).ModInfo(\"$(MOD_TOML)\", \"$(BUILD_DIR)\", \"$(LIB_BUILD_WIN)\", \"$(LIB_BUILD_MACOS)\", \"$(LIB_BUILD_LINUX)\", \"$(LIB_BUILD_NATIVE)\").$(1))")
 endef
+
+# Allow the user to specify the compiler and linker on macOS
+# as Apple Clang does not support MIPS architecture
+CC      := $(call get_python_func,get_mod_compiler,)
+LD      := $(call get_python_func,get_mod_linker,)
+
+ifeq ($(OS),Windows_NT)
+# CC      := clang
+# LD      := ld.lld
+NATIVE_TRIPLET := native-windows-x64
+NATIVE_SUBDIR := bin
+NATIVE_EXTENSION := dll
+else ifneq ($(shell uname),Darwin)
+# CC      := clang
+# LD      := ld.lld
+NATIVE_TRIPLET := native-linux-x64
+NATIVE_SUBDIR := lib
+NATIVE_EXTENSION := so
+else
+# CC      ?= clang
+# LD      ?= ld.lld
+NATIVE_TRIPLET := native-macos-x64
+NATIVE_SUBDIR := lib
+NATIVE_EXTENSION := dylib
+endif
 
 # Recomp Tools Building Info:
 N64RECOMP_DIR := N64Recomp

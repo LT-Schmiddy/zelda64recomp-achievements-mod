@@ -18,3 +18,4 @@ runtime/
 .vscode/settings.json
 .vscode/launch.json
 .vscode/tasks.json
+/recomp_user_compilers.json
