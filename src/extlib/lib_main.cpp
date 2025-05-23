@@ -9,5 +9,5 @@ extern "C" {
 }
 
 RECOMP_DLL_FUNC(test_func) {
-    RECOMP_RETURN(u32, 1);
+    RECOMP_RETURN(u32, 6);
 }

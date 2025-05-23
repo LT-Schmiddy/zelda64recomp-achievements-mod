@@ -8,6 +8,7 @@ set(TARGET_NAME recomp_achievements_lib)
 
 include_directories("./offline_build")
 include_directories("./include/extlib")
+include_directories("./include/shared")
 
 add_library(${TARGET_NAME} SHARED)
 
