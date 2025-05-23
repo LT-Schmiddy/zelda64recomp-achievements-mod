@@ -15,6 +15,9 @@ RECOMP_CALLBACK("*", recomp_on_init) void load_lib () {
             NULL,
             0,
             NULL,
+            {
+                0
+            },
             NULL
         }
     };

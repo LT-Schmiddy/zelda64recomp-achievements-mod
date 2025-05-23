@@ -6,7 +6,7 @@ extern "C" {
     #define TO_PTR(type, var) ((type*)(&rdram[(uint64_t)var - 0xFFFFFFFF80000000]))
     #define PTR(x) int32_t
 
-    #define NO_EXTERN_RECOMP_DLL_FUNC(_f_name) RECOMP_EXPORT void _f_name(uint8_t* rdram, recomp_context* ctx)
+
 
     // Type Defs:
     typedef uint8_t u8;
@@ -105,6 +105,7 @@ void _return(recomp_context* ctx, T val) {
     }
 }
 
+#define NO_EXTERN_RECOMP_DLL_FUNC(_f_name) RECOMP_EXPORT void _f_name(uint8_t* rdram, recomp_context* ctx)
 #define RECOMP_DLL_FUNC(_f_name) extern "C" NO_EXTERN_RECOMP_DLL_FUNC(_f_name)
 #define RECOMP_ARG(_type, _pos) _arg<_pos, _type>(rdram, ctx)
 #define RECOMP_ARG_STR(_pos) _arg_string<_pos>(rdram, ctx)

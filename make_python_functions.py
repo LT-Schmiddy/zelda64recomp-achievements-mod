@@ -33,6 +33,8 @@ class ModInfo:
         self.runtime_native_file = self.runtime_mods_dir.joinpath(self.build_native_file.name.removeprefix("lib"))
         
         self.assets_archive_path =self.project_root.joinpath("assets_archive.zip")
+        
+        # Handle recomp compilers:
 
     def get_mod_file(self):
         # print(f"{self.mod_data['inputs']['mod_filename']}.nrm")
