@@ -8,9 +8,9 @@ ASSETS_INCLUDE_DIR ?= assets_extracted/assets
 # Extlib Building Info:
 # (has to be here so python can use it.)
 CMAKE_LIB_BUILD_TYPE ?= Debug
-ZIG_WINDOWS_TRIPLET ?= zig-windows-x64
-ZIG_MACOS_TRIPLET ?= zig-macos-aarch64
-ZIG_LINUX_TRIPLET ?= zig-linux-x64
+ZIG_WINDOWS_PRESET ?= zig-windows-x64
+ZIG_MACOS_PRESET ?= zig-macos-aarch64
+ZIG_LINUX_PRESET ?= zig-linux-x64
 
 define extlib_build_file
 $(BUILD_DIR)/$(1)-$(2)/$(3)/$(LIB_PREFIX)$(LIB_NAME).$(4)
@@ -20,10 +20,10 @@ define native_extlib_build_file
 $(BUILD_DIR)/$(1)-$(2)/$(3)/$(LIB_NAME).$(4)
 endef
 
-LIB_BUILD_WIN := $(call extlib_build_file,$(ZIG_WINDOWS_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),bin,dll)
-LIB_BUILD_MACOS := $(call extlib_build_file,$(ZIG_MACOS_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),lib,dylib)
-LIB_BUILD_LINUX := $(call extlib_build_file,$(ZIG_LINUX_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),lib,so)
-LIB_BUILD_NATIVE := $(call native_extlib_build_file,$(NATIVE_TRIPLET),$(CMAKE_LIB_BUILD_TYPE),$(NATIVE_SUBDIR),$(NATIVE_EXTENSION))
+LIB_BUILD_WIN := $(call extlib_build_file,$(ZIG_WINDOWS_PRESET),$(CMAKE_LIB_BUILD_TYPE),bin,dll)
+LIB_BUILD_MACOS := $(call extlib_build_file,$(ZIG_MACOS_PRESET),$(CMAKE_LIB_BUILD_TYPE),lib,dylib)
+LIB_BUILD_LINUX := $(call extlib_build_file,$(ZIG_LINUX_PRESET),$(CMAKE_LIB_BUILD_TYPE),lib,so)
+LIB_BUILD_NATIVE := $(call native_extlib_build_file,$(NATIVE_CMAKE_PRESET),$(CMAKE_LIB_BUILD_TYPE),$(NATIVE_SUBDIR),$(NATIVE_EXTENSION))
 
 # Python Info:
 ifeq ($(OS),Windows_NT)
@@ -53,19 +53,22 @@ LD      := $(call get_python_func,get_mod_linker,)
 ifeq ($(OS),Windows_NT)
 # CC      := clang
 # LD      := ld.lld
-NATIVE_TRIPLET := native-windows-x64
+NATIVE_CMAKE_PRESET := native-windows-x64
+NATIVE_ZIG_TRIPLET := x86_64-windows
 NATIVE_SUBDIR := bin
 NATIVE_EXTENSION := dll
 else ifneq ($(shell uname),Darwin)
 # CC      := clang
 # LD      := ld.lld
-NATIVE_TRIPLET := native-linux-x64
+NATIVE_CMAKE_PRESET := native-linux-x64
+NATIVE_ZIG_TRIPLET := x86_64-linux
 NATIVE_SUBDIR := lib
 NATIVE_EXTENSION := so
 else
 # CC      ?= clang
 # LD      ?= ld.lld
-NATIVE_TRIPLET := native-macos-x64
+NATIVE_CMAKE_PRESET := native-macos-x64
+NATIVE_ZIG_TRIPLET := aarch64-macos
 NATIVE_SUBDIR := lib
 NATIVE_EXTENSION := dylib
 endif
@@ -144,7 +147,8 @@ $(ASSETS_INCLUDE_DIR):
 
 # Recomp Tools Recipes:
 $(RECOMP_MOD_TOOL): $(N64RECOMP_BUILD_DIR) 
-	cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S $(N64RECOMP_DIR) -B $(N64RECOMP_BUILD_DIR)
+	cmake -DCMAKE_TOOLCHAIN_FILE="../zig_toolchain.cmake" -DZIG_TARGET="$(NATIVE_ZIG_TRIPLET)" -G Ninja \
+		-DCMAKE_BUILD_TYPE=Release -S $(N64RECOMP_DIR) -B $(N64RECOMP_BUILD_DIR) 
 	cmake --build $(N64RECOMP_BUILD_DIR)
 
 # Extlib Recipes:
@@ -152,22 +156,22 @@ extlib-all: extlib-win extlib-macos extlib-linux
 
 # extlib-win: $(LIB_BUILD_WIN)
 extlib-win:
-	cmake --preset=$(ZIG_WINDOWS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
-	cmake --build --preset=$(ZIG_WINDOWS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
+	cmake --preset=$(ZIG_WINDOWS_PRESET)-$(CMAKE_LIB_BUILD_TYPE) .
+	cmake --build --preset=$(ZIG_WINDOWS_PRESET)-$(CMAKE_LIB_BUILD_TYPE)
 
 # extlib-macos: $(LIB_BUILD_MACOS)
 extlib-macos:
-	cmake --preset=$(ZIG_MACOS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
-	cmake --build --preset=$(ZIG_MACOS_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
+	cmake --preset=$(ZIG_MACOS_PRESET)-$(CMAKE_LIB_BUILD_TYPE) .
+	cmake --build --preset=$(ZIG_MACOS_PRESET)-$(CMAKE_LIB_BUILD_TYPE)
 
 # extlib-linux: $(LIB_BUILD_LINUX)
 extlib-linux:
-	cmake --preset=$(ZIG_LINUX_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
-	cmake --build --preset=$(ZIG_LINUX_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
+	cmake --preset=$(ZIG_LINUX_PRESET)-$(CMAKE_LIB_BUILD_TYPE) .
+	cmake --build --preset=$(ZIG_LINUX_PRESET)-$(CMAKE_LIB_BUILD_TYPE)
 
 extlib-native:
-	cmake --preset=$(NATIVE_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE) .
-	cmake --build --preset=$(NATIVE_TRIPLET)-$(CMAKE_LIB_BUILD_TYPE)
+	cmake --preset=$(NATIVE_CMAKE_PRESET)-$(CMAKE_LIB_BUILD_TYPE) .
+	cmake --build --preset=$(NATIVE_CMAKE_PRESET)-$(CMAKE_LIB_BUILD_TYPE)
 
 # Misc Recipes:
 clean:
