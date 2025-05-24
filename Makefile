@@ -12,6 +12,29 @@ ZIG_WINDOWS_PRESET ?= zig-windows-x64
 ZIG_MACOS_PRESET ?= zig-macos-aarch64
 ZIG_LINUX_PRESET ?= zig-linux-x64
 
+ifeq ($(OS),Windows_NT)
+# CC      := clang
+# LD      := ld.lld
+NATIVE_CMAKE_PRESET := native-windows-x64
+NATIVE_ZIG_TRIPLET := x86_64-windows
+NATIVE_SUBDIR := bin
+NATIVE_EXTENSION := dll
+else ifneq ($(shell uname),Darwin)
+# CC      := clang
+# LD      := ld.lld
+NATIVE_CMAKE_PRESET := native-linux-x64
+NATIVE_ZIG_TRIPLET := x86_64-linux
+NATIVE_SUBDIR := lib
+NATIVE_EXTENSION := so
+else
+# CC      ?= clang
+# LD      ?= ld.lld
+NATIVE_CMAKE_PRESET := native-macos-x64
+NATIVE_ZIG_TRIPLET := aarch64-macos
+NATIVE_SUBDIR := lib
+NATIVE_EXTENSION := dylib
+endif
+
 define extlib_build_file
 $(BUILD_DIR)/$(1)-$(2)/$(3)/$(LIB_PREFIX)$(LIB_NAME).$(4)
 endef
@@ -50,28 +73,7 @@ endef
 CC      := $(call get_python_func,get_mod_compiler,)
 LD      := $(call get_python_func,get_mod_linker,)
 
-ifeq ($(OS),Windows_NT)
-# CC      := clang
-# LD      := ld.lld
-NATIVE_CMAKE_PRESET := native-windows-x64
-NATIVE_ZIG_TRIPLET := x86_64-windows
-NATIVE_SUBDIR := bin
-NATIVE_EXTENSION := dll
-else ifneq ($(shell uname),Darwin)
-# CC      := clang
-# LD      := ld.lld
-NATIVE_CMAKE_PRESET := native-linux-x64
-NATIVE_ZIG_TRIPLET := x86_64-linux
-NATIVE_SUBDIR := lib
-NATIVE_EXTENSION := so
-else
-# CC      ?= clang
-# LD      ?= ld.lld
-NATIVE_CMAKE_PRESET := native-macos-x64
-NATIVE_ZIG_TRIPLET := aarch64-macos
-NATIVE_SUBDIR := lib
-NATIVE_EXTENSION := dylib
-endif
+
 
 # Recomp Tools Building Info:
 N64RECOMP_DIR := N64Recomp

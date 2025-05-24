@@ -25,12 +25,14 @@ class ModInfo:
         self.build_dylib_file = self.project_root.joinpath(macos_lib)
         self.build_so_file = self.project_root.joinpath(linux_lib)
         self.build_native_file = self.project_root.joinpath(native_lib)
+        self.build_native_pdb_file = self.build_native_file.with_suffix(".pdb")
         
         self.runtime_dll_file = self.runtime_mods_dir.joinpath(self.build_dll_file.name.removeprefix("lib"))
         self.runtime_pdb_file = self.runtime_mods_dir.joinpath(self.build_pdb_file.name.removeprefix("lib"))
         self.runtime_dylib_file = self.runtime_mods_dir.joinpath(self.build_dylib_file.name.removeprefix("lib"))
         self.runtime_so_file = self.runtime_mods_dir.joinpath(self.build_so_file.name.removeprefix("lib"))
         self.runtime_native_file = self.runtime_mods_dir.joinpath(self.build_native_file.name.removeprefix("lib"))
+        self.runtime_native_pdb_file = self.runtime_mods_dir.joinpath(self.build_native_pdb_file.name.removeprefix("lib"))
         
         self.assets_archive_path =self.project_root.joinpath("assets_archive.zip")
         
@@ -86,6 +88,7 @@ class ModInfo:
         self.copy_if_exists(self.build_dylib_file, self.runtime_dylib_file)
         self.copy_if_exists(self.build_so_file, self.runtime_so_file)
         self.copy_if_exists(self.build_native_file, self.runtime_native_file)
+        self.copy_if_exists(self.build_native_pdb_file, self.runtime_native_pdb_file)
 
     def copy_if_exists(self, src: Path, dest: Path):
         if src.exists():
