@@ -2,7 +2,6 @@
 #include "global.h"
 #include "recomputils.h"
 #include "recompconfig.h"
-
 #include "achievements.h"
 
 
@@ -12,20 +11,21 @@ Achievement gAchievements[] = {
         "Test Achievement",
         "An achievement for testing.",
         NULL,
-        10,
+        0,
         NULL,
         {
-            10
+            0
         },
         NULL
     }
 };
 
-RECOMP_IMPORT(".", void load_achievement(Achievement* achievement))
-
 RECOMP_CALLBACK("*", recomp_on_init) void load_lib () {
-    recomp_printf("Achievement SIZE MOD: %lu\n", sizeof(Achievement));
-    recomp_printf("ICON SIZE MOD: %i\n", gAchievements[0].icon_size);
-    load_achievement(&gAchievements[0]);
+    recomp_printf("NUMBER OF ACHIEVEMENTS: %i\n");
+    u32 count = sizeof(gAchievements) / sizeof(Achievement);
+
+    for (u32 i = 0; i < count; i++){
+        load_achievement(&gAchievements[i]);
+    }
 
 }

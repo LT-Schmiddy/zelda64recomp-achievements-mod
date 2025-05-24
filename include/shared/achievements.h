@@ -49,6 +49,12 @@ typedef PACKED_STRUCT {
     STRUCT_PTR(const char) script; // Optional. Can be NULL.
 } Achievement;
 
+
+#ifdef MIPS
+RECOMP_IMPORT(".", void init_achievement_lib())
+RECOMP_IMPORT(".", void load_achievement(Achievement* achievements))
+#endif
+
 #ifdef __cplusplus
 }
 #endif
