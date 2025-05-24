@@ -42,7 +42,7 @@ dependencies = [
 # Native libraries (e.g. DLLs) and the functions they export.
 native_libraries = [
 # Example native library:
-   { name = "recomp_achievements_lib", funcs = ["test_func"] }
+   { name = "recomp_achievements_lib", funcs = ["load_achievement"] }
 ]
 
 # Inputs to the mod tool.

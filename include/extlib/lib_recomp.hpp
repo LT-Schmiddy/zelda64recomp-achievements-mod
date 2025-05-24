@@ -6,8 +6,6 @@ extern "C" {
     #define TO_PTR(type, var) ((type*)(&rdram[(uint64_t)var - 0xFFFFFFFF80000000]))
     #define PTR(x) int32_t
 
-
-
     // Type Defs:
     typedef uint8_t u8;
     typedef uint16_t u16;
@@ -35,6 +33,22 @@ extern "C" {
     #define DLLEXPORT __attribute__((visibility("default")))
     #define DLLIMPORT
 #endif
+
+inline std::string ptr_to_string(uint8_t* rdram, PTR(char) str) {
+    size_t len = 0;
+    while (MEM_B(str, len) != 0x00) {
+        len++;
+    }
+
+    std::string ret{};
+    ret.reserve(len + 1);
+
+    for (size_t i = 0; i < len; i++) {
+        ret += (char)MEM_B(str, i);
+    }
+
+    return ret;
+}
 
 template<int index, typename T>
 T _arg(uint8_t* rdram, recomp_context* ctx) {
@@ -73,19 +87,7 @@ std::string _arg_string(uint8_t* rdram, recomp_context* ctx) {
     PTR(char) str = _arg<arg_index, PTR(char)>(rdram, ctx);
 
     // Get the length of the byteswapped string.
-    size_t len = 0;
-    while (MEM_B(str, len) != 0x00) {
-        len++;
-    }
-
-    std::string ret{};
-    ret.reserve(len + 1);
-
-    for (size_t i = 0; i < len; i++) {
-        ret += (char)MEM_B(str, i);
-    }
-
-    return ret;
+    return ptr_to_string(rdram, str);
 }
 
 template <typename T>
