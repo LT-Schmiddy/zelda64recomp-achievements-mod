@@ -6,25 +6,12 @@
 #include "recompconfig.h"
 
 #include "achievements_ui.h"
+#include "achievement_list.h"
 
-Achievement gAchievements[] = { 
-    {
-        "test_achievement",
-        "Test Achievement",
-        "An achievement for testing.",
-        NULL,
-        0,
-        NULL,
-        {
-            0
-        },
-        NULL
-    }
-};
 
 RECOMP_CALLBACK("*", recomp_on_init) void load_lib () {
     recomp_printf("NUMBER OF ACHIEVEMENTS: %i\n");
-    u32 count = ARRAY_COUNT(gAchievements);
+    u32 count = GetAchievementCount();
 
     AchievementLib_Init();
 
