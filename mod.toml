@@ -43,8 +43,8 @@ dependencies = [
 native_libraries = [
 # Example native library:
    { name = "recomp_achievements_lib", funcs = [
-      "init_achievement_lib",
-      "load_achievement"
+      "AchievementLib_Init",
+      "AchievementLib_Declare"
    ] }
 ]
 

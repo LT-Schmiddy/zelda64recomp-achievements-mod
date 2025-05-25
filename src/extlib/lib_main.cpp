@@ -24,5 +24,11 @@ RECOMP_DLL_FUNC(AchievementLib_Declare) {
     Achievement* achievement = RECOMP_ARG(Achievement*, 0);
 
     printf("Achievement ID: %s\n", ptr_to_string(rdram, (PTR(const char*))achievement->id).c_str());
-    printf("ICON SIZE NATIVE: %i\n", achievement->icon_size);
+}
+
+RECOMP_DLL_FUNC(AchievementLib_SetBooleanFlag) {
+    std::string achievement_id = RECOMP_ARG_STR(0);
+    bool value = RECOMP_ARG(bool, 1);
+
+    printf("Set Achievement '%s' to %i\n", achievement_id.c_str(), value);
 }

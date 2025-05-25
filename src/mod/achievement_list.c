@@ -7,7 +7,7 @@ Achievement gAchievements[] = {
         "Test Achievement",
         "An achievement for testing.",
         NULL,
-        0,
+        NULL,
         NULL,
         {
             0

@@ -1,4 +1,7 @@
 
+#ifndef __ACHIEVEMENTS__
+#define __ACHIEVEMENTS__
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,7 +46,7 @@ typedef PACKED_STRUCT {
     STRUCT_PTR(const char) display_name;
     STRUCT_PTR(const char) description;
     STRUCT_PTR(const ACH_BYTE) icon;
-    const ACH_U32 icon_size;
+    STRUCT_PTR(const ACH_BYTE) icon_end;
     STRUCT_PTR(const char) additional_flags; // Optional. Can be NULL. Comma-seperated list.
     const AchievementRAInfo ra_info; // Optional. Can be NULL.
     STRUCT_PTR(const char) script; // Optional. Can be NULL.
@@ -54,8 +57,11 @@ typedef PACKED_STRUCT {
 #include "modding.h"
 RECOMP_IMPORT(".", void AchievementLib_Init());
 RECOMP_IMPORT(".", void AchievementLib_Declare(Achievement* achievements));
+RECOMP_IMPORT(".", void AchievementLib_SetBooleanFlag(const char* achievement_id, bool value));
 #endif
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
