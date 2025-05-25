@@ -51,8 +51,9 @@ typedef PACKED_STRUCT {
 
 
 #ifdef MIPS
-RECOMP_IMPORT(".", void init_achievement_lib())
-RECOMP_IMPORT(".", void load_achievement(Achievement* achievements))
+#include "modding.h"
+RECOMP_IMPORT(".", void AchievementLib_Init());
+RECOMP_IMPORT(".", void AchievementLib_Declare(Achievement* achievements));
 #endif
 
 #ifdef __cplusplus

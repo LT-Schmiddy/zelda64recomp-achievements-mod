@@ -16,11 +16,11 @@ extern "C" {
 
 uint8_t* recomp_rdram = NULL;
 
-RECOMP_DLL_FUNC(init_achievements_lib) {
+RECOMP_DLL_FUNC(AchievementLib_Init) {
     recomp_rdram = rdram;
 }
 
-RECOMP_DLL_FUNC(load_achievement) {
+RECOMP_DLL_FUNC(AchievementLib_Declare) {
     Achievement* achievement = RECOMP_ARG(Achievement*, 0);
 
     printf("Achievement ID: %s\n", ptr_to_string(rdram, (PTR(const char*))achievement->id).c_str());
