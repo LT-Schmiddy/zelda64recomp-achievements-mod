@@ -49,7 +49,8 @@ class ModInfo:
         self.recomp_compiler_info = {
             "mod_compiling": {
                 "compiler": "clang",
-                "linker": "ld.lld"
+                "linker": "ld.lld",
+                "archiver": "llvm ar"
             }
         }
         self.recomp_user_compilers_path.write_text(json.dumps(self.recomp_compiler_info, indent=4))
@@ -66,6 +67,9 @@ class ModInfo:
         
     def get_mod_linker(self):
         print(self.recomp_compiler_info["mod_compiling"]["linker"])
+        
+    def get_mod_archiver(self):
+        print(self.recomp_compiler_info["mod_compiling"]["archiver"])
 
     def create_asset_archive(self, assets_extract_path_str: str):
             assets_extract_path = self.project_root.joinpath(assets_extract_path_str)

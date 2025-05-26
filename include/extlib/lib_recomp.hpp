@@ -50,21 +50,21 @@ inline std::string ptr_to_string(uint8_t* rdram, PTR(char) str) {
     return ret;
 }
 
-inline std::u8string ptr_to_u8string(uint8_t* rdram, PTR(char) str) {
-    size_t len = 0;
-    while (MEM_B(str, len) != 0x00) {
-        len++;
-    }
+// inline std::u8string ptr_to_u8string(uint8_t* rdram, PTR(char) str) {
+//     size_t len = 0;
+//     while (MEM_B(str, len) != 0x00) {
+//         len++;
+//     }
 
-    std::u8string ret{};
-    ret.reserve(len + 1);
+//     std::u8string ret{};
+//     ret.reserve(len + 1);
 
-    for (size_t i = 0; i < len; i++) {
-        ret += (char)MEM_B(str, i);
-    }
+//     for (size_t i = 0; i < len; i++) {
+//         ret += (char)MEM_B(str, i);
+//     }
 
-    return ret;
-}
+//     return ret;
+// }
 
 template<int index, typename T>
 T _arg(uint8_t* rdram, recomp_context* ctx) {
@@ -106,13 +106,13 @@ std::string _arg_string(uint8_t* rdram, recomp_context* ctx) {
     return ptr_to_string(rdram, str);
 }
 
-template <int arg_index>
-std::string _arg_u8string(uint8_t* rdram, recomp_context* ctx) {
-    PTR(char) str = _arg<arg_index, PTR(char)>(rdram, ctx);
+// template <int arg_index>
+// std::string _arg_u8string(uint8_t* rdram, recomp_context* ctx) {
+//     PTR(char) str = _arg<arg_index, PTR(char)>(rdram, ctx);
 
-    // Get the length of the byteswapped string.
-    return ptr_to_u8string(rdram, str);
-}
+//     // Get the length of the byteswapped string.
+//     return ptr_to_u8string(rdram, str);
+// }
 
 template <typename T>
 void _return(recomp_context* ctx, T val) {

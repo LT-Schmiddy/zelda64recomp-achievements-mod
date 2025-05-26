@@ -1,7 +1,11 @@
 BUILD_DIR := build
 MOD_TOML := ./mod.toml
-LIB_NAME := recomp_achievements_lib
-LIB_PREFIX := lib
+STATIC_LIB_NAME := Achievements
+STATIC_LIB_PREFIX := lib
+# STATIC_LIB_FILENAME := $(BUILD_DIR)/$(STATIC_LIB_NAME).a
+STATIC_LIB_FILENAME := $(BUILD_DIR)/$(STATIC_LIB_PREFIX)$(STATIC_LIB_NAME).a
+NATIVE_LIB_NAME := AchievementsNative
+NATIVE_LIB_PREFIX := lib
 ASSETS_EXTRACTED_DIR ?= assets_extracted
 ASSETS_INCLUDE_DIR ?= assets_extracted/assets
 
@@ -36,11 +40,11 @@ NATIVE_EXTENSION := dylib
 endif
 
 define extlib_build_file
-$(BUILD_DIR)/$(1)-$(2)/$(3)/$(LIB_PREFIX)$(LIB_NAME).$(4)
+$(BUILD_DIR)/$(1)-$(2)/$(3)/$(NATIVE_LIB_PREFIX)$(NATIVE_LIB_NAME).$(4)
 endef
 
 define native_extlib_build_file
-$(BUILD_DIR)/$(1)-$(2)/$(3)/$(LIB_NAME).$(4)
+$(BUILD_DIR)/$(1)-$(2)/$(3)/$(NATIVE_LIB_NAME).$(4)
 endef
 
 LIB_BUILD_WIN := $(call extlib_build_file,$(ZIG_WINDOWS_PRESET),$(CMAKE_LIB_BUILD_TYPE),bin,dll)
@@ -72,6 +76,7 @@ endef
 # as Apple Clang does not support MIPS architecture
 CC      := $(call get_python_func,get_mod_compiler,)
 LD      := $(call get_python_func,get_mod_linker,)
+AR      := $(call get_python_func,get_mod_archiver,)
 
 
 
@@ -82,7 +87,6 @@ RECOMP_MOD_TOOL := $(N64RECOMP_BUILD_DIR)/RecompModTool
 OFFLINE_MOD_TOOL := $(N64RECOMP_BUILD_DIR)/OfflineModRecomp
 
 # Mod Building Info:
-
 MOD_FILE := $(call get_python_func,get_mod_file,)
 $(info MOD_FILE = $(MOD_FILE))
 MOD_ELF  := $(call get_python_func,get_mod_elf,)
@@ -93,18 +97,30 @@ MOD_BINARY := $(BUILD_DIR)/mod_binary.bin
 ZELDA_SYMS := Zelda64RecompSyms/mm.us.rev1.syms.toml
 OFFLINE_C_OUTPUT := $(BUILD_DIR)/mod_offline.c
 LDSCRIPT := mod.ld
-CFLAGS   := -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
+MOD_CFLAGS   := -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
 			-fomit-frame-pointer -ffast-math -fno-unsafe-math-optimizations -fno-builtin-memset \
 			-Wall -Wextra -Wno-incompatible-library-redeclaration -Wno-unused-parameter -Wno-unknown-pragmas -Wno-unused-variable \
 			-Wno-missing-braces -Wno-unsupported-floating-point-opt -Werror=section
-CPPFLAGS := -nostdinc -D_LANGUAGE_C -DMIPS -DF3DEX_GBI_2 -DF3DEX_GBI_PL -DGBI_DOWHILE -I include -I include/mod -I include/mod/dummy_headers \
-			-I src/mod -I include/shared -I mm-decomp/include -I mm-decomp/src -I mm-decomp/extracted/n64-us -I mm-decomp/include/libc \
-			-I assets_extracted -I assets_extracted/assets -I assets_extracted/assets/assets
-LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map $(BUILD_DIR)/mod.map --unresolved-symbols=ignore-all --emit-relocs -e 0 --no-nmagic
+MOD_CPPFLAGS := -nostdinc -D_LANGUAGE_C -DMIPS -DF3DEX_GBI_2 -DF3DEX_GBI_PL -DGBI_DOWHILE -I include -I include/mod -I include/mod/dummy_headers \
+			-I include/lib -I src/mod -I src/lib -I include/shared -I mm-decomp/include -I mm-decomp/src -I mm-decomp/extracted/n64-us -I mm-decomp/include/libc \
+			-I assets_extracted -I assets_extracted/assets -I assets_extracted/assets/assets 
+MOD_LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map $(BUILD_DIR)/mod.map --unresolved-symbols=ignore-all --emit-relocs -e 0 --no-nmagic -L build -l$(STATIC_LIB_NAME)
 
-C_SRCS := $(wildcard src/mod/*.c) $(wildcard src/mod/achievement_hooks/*.c)
-C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.o))
-C_DEPS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.d))
+MOD_C_SRCS := $(wildcard src/mod/*.c) $(wildcard src/mod/achievement_hooks/*.c)
+MOD_C_OBJS := $(addprefix $(BUILD_DIR)/, $(MOD_C_SRCS:.c=.o))
+MOD_C_DEPS := $(addprefix $(BUILD_DIR)/, $(MOD_C_SRCS:.c=.d))
+
+# Static Lib Info
+
+STATIC_LIB_CFLAGS   := -target mips -mips2 -mabi=32 -O2 -G0 -mno-abicalls -mno-odd-spreg -mno-check-zero-division \
+			-fomit-frame-pointer -ffast-math -fno-unsafe-math-optimizations -fno-builtin-memset \
+			-Wall -Wextra -Wno-incompatible-library-redeclaration -Wno-unused-parameter -Wno-unknown-pragmas -Wno-unused-variable \
+			-Wno-missing-braces -Wno-unsupported-floating-point-opt -Werror=section
+STATIC_LIB_CPPFLAGS := -nostdinc -D_LANGUAGE_C -DMIPS -I include -I include/lib -I include/shared -I src/lib 
+
+STATIC_LIB_C_SRCS := $(wildcard src/lib/*.c)
+STATIC_LIB_C_OBJS := $(addprefix $(BUILD_DIR)/, $(STATIC_LIB_C_SRCS:.c=.o))
+STATIC_LIB_C_DEPS := $(addprefix $(BUILD_DIR)/, $(STATIC_LIB_C_SRCS:.c=.d))
 
 # General Recipes:
 all: nrm extlib-all runtime
@@ -131,21 +147,30 @@ offline: nrm
 
 elf: $(MOD_ELF) 
 
-$(MOD_ELF): $(C_OBJS) $(LDSCRIPT) | $(BUILD_DIR) $(ASSETS_INCLUDE_DIR)
-	$(LD) $(C_OBJS) $(LDFLAGS) -o $@
+$(MOD_ELF): $(STATIC_LIB_FILENAME) $(MOD_C_OBJS) $(LDSCRIPT) | $(BUILD_DIR) $(ASSETS_INCLUDE_DIR) 
+	$(LD) $(MOD_C_OBJS) $(MOD_LDFLAGS) -o $@
 
-$(BUILD_DIR) $(BUILD_DIR)/src $(BUILD_DIR)/src/mod $(BUILD_DIR)/src/mod/achievement_hooks $(N64RECOMP_BUILD_DIR):
+$(BUILD_DIR) $(BUILD_DIR)/src $(BUILD_DIR)/src/mod $(BUILD_DIR)/src/lib $(BUILD_DIR)/src/mod/achievement_hooks $(N64RECOMP_BUILD_DIR):
 ifeq ($(OS),Windows_NT)
 	mkdir $(subst /,\,$@)
 else
 	mkdir -p $@
 endif
 
-$(C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIR) $(BUILD_DIR)/src/mod $(BUILD_DIR)/src/mod/achievement_hooks $(ASSETS_INCLUDE_DIR)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $< -MMD -MF $(@:.o=.d) -c -o $@
+$(MOD_C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIR) $(BUILD_DIR)/src/mod $(BUILD_DIR)/src/mod/achievement_hooks $(ASSETS_INCLUDE_DIR)
+	$(CC) $(MOD_CFLAGS) $(MOD_CPPFLAGS) $< -MMD -MF $(@:.o=.d) -c -o $@
 
 $(ASSETS_INCLUDE_DIR):
 	$(call call_python_func,create_asset_archive,\"$(ASSETS_INCLUDE_DIR)\")
+
+# Static Lib Recipes:
+lib: $(STATIC_LIB_FILENAME)
+
+$(STATIC_LIB_FILENAME): $(STATIC_LIB_C_OBJS)
+	$(AR) rcs $@ $^
+
+$(STATIC_LIB_C_OBJS): $(BUILD_DIR)/%.o : %.c | $(BUILD_DIR) $(BUILD_DIR)/src/lib
+	$(CC) $(STATIC_LIB_CFLAGS) $(STATIC_LIB_CPPFLAGS) $< -MMD -MF $(@:.o=.d) -c -o $@
 
 # Recomp Tools Recipes:
 $(RECOMP_MOD_TOOL): $(N64RECOMP_BUILD_DIR) 
@@ -187,6 +212,6 @@ else
 	- rm -rf $(ASSETS_EXTRACTED_DIR)
 endif
 
--include $(C_DEPS)
+-include $(MOD_C_DEPS) $(STATIC_LIB_C_DEPS)
 
 .PHONY: all runtime nrm native offline extlib-all extlib-win extlib-macos extlib-linux extlib-native clean

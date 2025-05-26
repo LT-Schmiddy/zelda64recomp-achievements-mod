@@ -3,6 +3,4 @@
 
 #include "achievements.h"
 
-extern Achievement gAchievements[];
-
 #endif

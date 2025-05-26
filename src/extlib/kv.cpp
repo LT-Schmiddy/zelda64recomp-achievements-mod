@@ -40,7 +40,7 @@ DLLEXPORT void KV_Init(uint8_t* rdram, recomp_context* ctx) {
 }
 
 DLLEXPORT void KV_PathUpdateInternal(uint8_t* rdram, recomp_context* ctx) {
-    fs::path new_path = fs::path(RECOMP_ARG_U8STR(0)).replace_extension(DB_FILE_EXT);
+    fs::path new_path = fs::path(RECOMP_ARG_STR(0)).replace_extension(DB_FILE_EXT);
 
     if (kvState == -1) {
         DB_FILE = new_path;

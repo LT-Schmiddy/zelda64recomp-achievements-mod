@@ -1,10 +1,10 @@
 #include "modding.h"
-#include "global.h"
 #include "recomputils.h"
 #include "recompconfig.h"
 #include "achievements.h"
 
-#include "input_handling.h"
+
+// #include "input_handling.h"
 #include "achievements_ui.h"
 
 AchievementMenu achievementMenu;
@@ -100,23 +100,23 @@ void AchievementsMenu_Construct() {
     achievementMenu.constructed = true;
 }
 
-RECOMP_HOOK("KaleidoScope_DrawQuestStatus") void pre_KaleidoScope_DrawQuestStatus(PlayState* play) {
-    PauseContext* pauseCtx = &play->pauseCtx;
+// RECOMP_HOOK("KaleidoScope_DrawQuestStatus") void pre_KaleidoScope_DrawQuestStatus(PlayState* play) {
+//     PauseContext* pauseCtx = &play->pauseCtx;
 
-    if (pauseCtx->pageIndex == PAUSE_QUEST && BtnStateCUp.press) {
+//     if (pauseCtx->pageIndex == PAUSE_QUEST && BtnStateCUp.press) {
 
-        AchievementsMenu_SetVisible(!achievementMenu.visible);
+//         AchievementsMenu_SetVisible(!achievementMenu.visible);
 
-        recomp_printf("achievementMenu.visible = %i\n", achievementMenu.visible);
-    }
+//         recomp_printf("achievementMenu.visible = %i\n", achievementMenu.visible);
+//     }
 
-    if (achievementMenu._toggled_visible) {
-        if (achievementMenu.visible) {
-            recompui_show_context(achievementMenu.context);
-        }
-        else {
-            recompui_hide_context(achievementMenu.context);
-        }
-        achievementMenu._toggled_visible = false;
-    }
-}
+//     if (achievementMenu._toggled_visible) {
+//         if (achievementMenu.visible) {
+//             recompui_show_context(achievementMenu.context);
+//         }
+//         else {
+//             recompui_hide_context(achievementMenu.context);
+//         }
+//         achievementMenu._toggled_visible = false;
+//     }
+// }

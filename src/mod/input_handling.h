@@ -14,6 +14,4 @@ typedef struct {
 
 extern BtnState BtnStateCUp;
 
-
-
 #endif

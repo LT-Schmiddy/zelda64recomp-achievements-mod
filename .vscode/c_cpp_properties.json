@@ -6,6 +6,7 @@
                 "${workspaceFolder}/include/shared/",
                 "${workspaceFolder}/include/mod/",
                 "${workspaceFolder}/include/mod/dummy_headers",
+                "${workspaceFolder}/include/lib",
                 "${workspaceFolder}/include/extlib",
                 "${workspaceFolder}/mm-decomp/include",
                 "${workspaceFolder}/mm-decomp/src",
