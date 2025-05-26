@@ -6,12 +6,12 @@
 #include "AchievementWrapper.hpp"
 
 
-class AchievementFlagWrapper {
+class AchievementFlag {
 public:
     AchievementFlagDefinition* flag = NULL;
 
-    std::vector<std::shared_ptr<AchievementFlagWrapper>> achievement;
+    std::vector<std::shared_ptr<AchievementWrapper>> achievements;
 
-    AchievementFlagWrapper();
+    AchievementFlag();
     AchievementFlagType getType();
 };
