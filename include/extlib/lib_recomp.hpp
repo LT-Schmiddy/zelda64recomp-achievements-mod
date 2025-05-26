@@ -50,6 +50,22 @@ inline std::string ptr_to_string(uint8_t* rdram, PTR(char) str) {
     return ret;
 }
 
+inline std::u8string ptr_to_u8string(uint8_t* rdram, PTR(char) str) {
+    size_t len = 0;
+    while (MEM_B(str, len) != 0x00) {
+        len++;
+    }
+
+    std::u8string ret{};
+    ret.reserve(len + 1);
+
+    for (size_t i = 0; i < len; i++) {
+        ret += (char)MEM_B(str, i);
+    }
+
+    return ret;
+}
+
 template<int index, typename T>
 T _arg(uint8_t* rdram, recomp_context* ctx) {
     static_assert(index < 4, "Only args 0 through 3 supported");
@@ -90,6 +106,14 @@ std::string _arg_string(uint8_t* rdram, recomp_context* ctx) {
     return ptr_to_string(rdram, str);
 }
 
+template <int arg_index>
+std::string _arg_u8string(uint8_t* rdram, recomp_context* ctx) {
+    PTR(char) str = _arg<arg_index, PTR(char)>(rdram, ctx);
+
+    // Get the length of the byteswapped string.
+    return ptr_to_u8string(rdram, str);
+}
+
 template <typename T>
 void _return(recomp_context* ctx, T val) {
     static_assert(sizeof(T) <= 4 && "Only 32-bit value returns supported currently");
@@ -111,4 +135,5 @@ void _return(recomp_context* ctx, T val) {
 #define RECOMP_DLL_FUNC(_f_name) extern "C" NO_EXTERN_RECOMP_DLL_FUNC(_f_name)
 #define RECOMP_ARG(_type, _pos) _arg<_pos, _type>(rdram, ctx)
 #define RECOMP_ARG_STR(_pos) _arg_string<_pos>(rdram, ctx)
+#define RECOMP_ARG_U8STR(_pos) _arg_u8string<_pos>(rdram, ctx)
 #define RECOMP_RETURN(_type, _value) _return(ctx, (_type) _value); return

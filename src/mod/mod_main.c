@@ -10,9 +10,8 @@
 
 
 RECOMP_CALLBACK("*", recomp_on_init) void load_lib () {
-    recomp_printf("NUMBER OF ACHIEVEMENTS: %i\n");
     u32 count = GetAchievementCount();
-
+    recomp_printf("NUMBER OF ACHIEVEMENTS: %i\n", count);
     AchievementLib_Init();
 
     // Recomp argument helpers don't support double pointers.

@@ -10,8 +10,11 @@ extern "C" {
 // All numerical types should have a size of 32-bit.
 // We also need to make sure that the native side treats pointers
 // and unsigned, 32-bit integers
-
+#ifdef COMBINED_INTELLISENSE
+#define PACKED_STRUCT struct
+#else 
 #define PACKED_STRUCT struct __attribute__((packed))
+#endif
 
 #define ACH_BYTE unsigned char
 #define ACH_U32 unsigned int
@@ -52,12 +55,17 @@ typedef PACKED_STRUCT {
     STRUCT_PTR(const char) script; // Optional. Can be NULL.
 } Achievement;
 
+// This is only here so VSCode will stop whining on the 'Combined' Intellisense Mode.
+#ifdef COMBINED_INTELLISENSE
+#undef MIPS
+#else 
+#endif
 
 #ifdef MIPS
 #include "modding.h"
 RECOMP_IMPORT(".", void AchievementLib_Init());
-RECOMP_IMPORT(".", void AchievementLib_Declare(Achievement* achievements));
-RECOMP_IMPORT(".", void AchievementLib_SetBooleanFlag(const char* achievement_id, bool value));
+RECOMP_IMPORT(".", void AchievementLib_Declare(Achievement* achievement));
+RECOMP_IMPORT(".", void AchievementLib_SetBooleanFlag(const char* achievement_id, ACH_U32 value));
 #endif
 
 #ifdef __cplusplus

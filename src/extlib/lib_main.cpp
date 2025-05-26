@@ -3,16 +3,17 @@
 #include <string>
 #include <bit>
 #include <string.h>
-
-
 #include "achievements.h"
 
 #include "sqlite3.h"
 #include "lib_recomp.hpp"
+
  
 extern "C" {
     DLLEXPORT uint32_t recomp_api_version = 1;
+    
 }
+
 
 uint8_t* recomp_rdram = NULL;
 
