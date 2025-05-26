@@ -4,7 +4,7 @@ project(recomp_achievements_lib)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(TARGET_NAME recomp_achievements_lib)
+set(TARGET_NAME AchievementLib)
 
 include_directories("./offline_build")
 include_directories("./include/extlib")

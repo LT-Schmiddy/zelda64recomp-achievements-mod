@@ -1,6 +1,6 @@
 BUILD_DIR := build
 MOD_TOML := ./mod.toml
-LIB_NAME := recomp_achievements_lib
+LIB_NAME := AchievementLib
 LIB_PREFIX := lib
 ASSETS_EXTRACTED_DIR ?= assets_extracted
 ASSETS_INCLUDE_DIR ?= assets_extracted/assets

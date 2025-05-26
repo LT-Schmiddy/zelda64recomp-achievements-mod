@@ -107,7 +107,7 @@ std::string _arg_string(uint8_t* rdram, recomp_context* ctx) {
 }
 
 template <int arg_index>
-std::string _arg_u8string(uint8_t* rdram, recomp_context* ctx) {
+std::u8string _arg_u8string(uint8_t* rdram, recomp_context* ctx) {
     PTR(char) str = _arg<arg_index, PTR(char)>(rdram, ctx);
 
     // Get the length of the byteswapped string.
