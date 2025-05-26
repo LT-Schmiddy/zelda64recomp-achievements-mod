@@ -38,7 +38,7 @@ typedef PACKED_STRUCT {
     STRUCT_PTR(const char) id;
     AchievementFlagType type;
     STRUCT_PTR(const char) default_value; // Write as a string. The extlib will process this into the correct format
-} AchievementFlag;
+} AchievementFlagDefinition;
 
 typedef PACKED_STRUCT {
     ACH_U32 ra_id;
