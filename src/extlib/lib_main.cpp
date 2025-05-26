@@ -17,17 +17,17 @@ extern "C" {
 
 uint8_t* recomp_rdram = NULL;
 
-RECOMP_DLL_FUNC(AchievementLib_Init) {
+RECOMP_DLL_FUNC(AchievementNative_Init) {
     recomp_rdram = rdram;
 }
 
-RECOMP_DLL_FUNC(AchievementLib_Declare) {
+RECOMP_DLL_FUNC(AchievementNative_Declare) {
     Achievement* achievement = RECOMP_ARG(Achievement*, 0);
 
     printf("Achievement ID: %s\n", ptr_to_string(rdram, (PTR(const char*))achievement->id).c_str());
 }
 
-RECOMP_DLL_FUNC(AchievementLib_SetBooleanFlag) {
+RECOMP_DLL_FUNC(AchievementNative_SetBooleanFlag) {
     std::string achievement_id = RECOMP_ARG_STR(0);
     bool value = RECOMP_ARG(bool, 1);
 

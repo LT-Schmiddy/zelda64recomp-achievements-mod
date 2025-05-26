@@ -4,6 +4,7 @@
 #include "recompui.h"
 #include "recompui_event_structs.h"
 #include "menu_helpers.h"
+#include "basic_defs.h"
 
 typedef struct {
     bool constructed;

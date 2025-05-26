@@ -56,18 +56,6 @@ typedef PACKED_STRUCT {
 } Achievement;
 
 // This is only here so VSCode will stop whining on the 'Combined' Intellisense Mode.
-#ifdef COMBINED_INTELLISENSE
-#undef MIPS
-#else 
-#endif
-
-#ifdef MIPS
-#include "modding.h"
-RECOMP_IMPORT(".", void AchievementLib_Init());
-RECOMP_IMPORT(".", void AchievementLib_Declare(Achievement* achievement));
-RECOMP_IMPORT(".", void AchievementLib_SetBooleanFlag(const char* achievement_id, ACH_U32 value));
-#endif
-
 #ifdef __cplusplus
 }
 #endif
