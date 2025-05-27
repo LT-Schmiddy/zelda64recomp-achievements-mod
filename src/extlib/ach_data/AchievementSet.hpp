@@ -17,6 +17,7 @@ public:
     ~AchievementSet();
 
     void declareAchievement(Achievement* achievement);
+    std::shared_ptr<AchievementFlag> getFlag(std::string flag_id);
 
 private:
     

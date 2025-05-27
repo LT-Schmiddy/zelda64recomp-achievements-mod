@@ -18,25 +18,34 @@ namespace fs = std::filesystem;
 
 class AchievementController {
 public: 
-    AchievementController(uint8_t* p_recomp_rdram, int p_number_of_slots, fs::path p_path);
+    AchievementController(uint8_t* p_recomp_rdram, unsigned int p_number_of_slots, fs::path p_path);
     ~AchievementController();
+
+    uint8_t* getRdram();
+    void setRdram(uint8_t* p_recomp_rdram);
+    unsigned int getNumberOfSlots();
+
+
+
+    void setU32Flag(std::string ach_set, std::string flag_id, unsigned int slot, unsigned int value);
+    void setS32Flag(std::string ach_set, std::string flag_id, unsigned int slot, int value);
+    void setF32Flag(std::string ach_set, std::string flag_id, unsigned int slot, float value);
+
+    void declareAchievement(std::string ach_set, Achievement* achievement);
+    // Database Handling:
 
     int initDatabase(fs::path p_path);
     int updateSavePath(fs::path p_path);
 
-    int setFlag(std::string ach_set, std::string key, int slot, size_t size, void* data);
-    int getFlag(std::string ach_set, std::string key, int slot, size_t size, void* write_data);
-    int hasFlag(std::string ach_set, std::string key, int slot);
-    int deleteFlag(std::string ach_set, std::string key, int slot);
-    
-    // These are meant to affect all slots:
-    int deleteSlotFlags(int slot);
-    int copySlotFlags(int dst_slot, int src_slot);
+    int dbSetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data);
+    int dbGetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* write_data);
+    int dbHasFlag(std::string ach_set, std::string flag_id, unsigned int slot);
+    int dbDeleteFlag(std::string ach_set, std::string flag_id, unsigned int slot);
+    int dbDeleteSlotFlags(unsigned int slot);
+    int dbCopySlotFlags(unsigned int dst_slot, unsigned int src_slot);
 
-    void declareAchievement(std::string ach_set, Achievement* achievement);
-    uint8_t* getRdram();
-    void setRdram(uint8_t* p_recomp_rdram);
-    unsigned int getNumberOfSlots();
+    int dbSaveSOTValues(unsigned int slot);
+    int dbRevertToSOTValues(unsigned int slot);
 
 private:
     uint8_t* recomp_rdram = NULL;

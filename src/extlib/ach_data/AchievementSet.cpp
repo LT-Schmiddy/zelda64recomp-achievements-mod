@@ -14,6 +14,10 @@ AchievementSet::AchievementSet(AchievementController* p_controller, std::string 
 
 AchievementSet::~AchievementSet(){}
 
+std::shared_ptr<AchievementFlag> AchievementSet::getFlag(std::string flag_id) {
+    return flags.at(flag_id);
+}
+
 void AchievementSet::declareAchievement(Achievement* achievement) {
 
     // Create the default flag for the achievement:

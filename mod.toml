@@ -43,8 +43,9 @@ dependencies = [
 native_libraries = [
 # Example native library:
    { name = "AchievementNative", funcs = [
-      "AchievementLib_Init",
-      "AchievementLib_Declare"
+      "AchievementNative_Init",
+      "AchievementNative_Declare",
+      "AchievementNative_SetU32Flag",
    ] }
 ]
 

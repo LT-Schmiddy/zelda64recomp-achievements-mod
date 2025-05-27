@@ -18,8 +18,14 @@ public:
 
     void addDependentAchievement(std::shared_ptr<AchievementWrapper> ach);
 
-    void loadFlagFromDb(int slot);
-    void saveFlagToDb(int slot);
+    void loadFromDb(unsigned int slot);
+    void saveToDb(unsigned int slot);
+
+    void loadDefaultValue(unsigned int slot);
+
+    void writeValue(unsigned int slot, void* addr);
+    void readValue(unsigned int slot, void* addr);
+    void updateAchievements(unsigned int slot);
 
     
 private:
@@ -31,6 +37,6 @@ private:
     size_t data_size = 0;
     unsigned char** data = NULL;
 
-    std::unordered_map<std::string,std::shared_ptr<AchievementWrapper>> dependend_achievements;
+    std::unordered_map<std::string,std::shared_ptr<AchievementWrapper>> dependent_achievements;
 
 };

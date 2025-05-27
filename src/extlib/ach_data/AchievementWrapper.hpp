@@ -19,6 +19,7 @@ public:
     std::string getDescription();
 
     void addRequiredFlag(std::shared_ptr<AchievementFlag> flag);
+    void updateUnlock(unsigned int slot);
 
 private:
 

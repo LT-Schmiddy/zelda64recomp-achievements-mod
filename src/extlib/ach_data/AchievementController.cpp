@@ -8,7 +8,7 @@
 #include "AchievementFlag.hpp"
 #include "AchievementSet.hpp"
 
-AchievementController::AchievementController(uint8_t* p_recomp_rdram, int p_number_of_slots, fs::path p_path) {
+AchievementController::AchievementController(uint8_t* p_recomp_rdram, unsigned int p_number_of_slots, fs::path p_path) {
     recomp_rdram = p_recomp_rdram;
     number_of_slots = p_number_of_slots;
     updateSavePath(p_path);
@@ -16,7 +16,49 @@ AchievementController::AchievementController(uint8_t* p_recomp_rdram, int p_numb
 
 AchievementController::~AchievementController() {}
 
+void AchievementController::setU32Flag(std::string ach_set, std::string flag_id, unsigned int slot, unsigned int value){
+    std::shared_ptr<AchievementSet> set = achievement_sets.at(ach_set);
+    std::shared_ptr<AchievementFlag> flag = set->getFlag(flag_id);
 
+    flag->writeValue(slot, &value);
+    flag->updateAchievements(slot);
+}
+
+void AchievementController::setS32Flag(std::string ach_set, std::string flag_id, unsigned int slot, int value) {
+
+}
+
+void AchievementController::setF32Flag(std::string ach_set, std::string flag_id, unsigned int slot, float value) {
+
+}
+
+// Achievement Setup:
+void AchievementController::declareAchievement(std::string ach_set, Achievement* achievement) {
+    if (!achievement_sets.contains(ach_set)) {
+        PLOGD.printf("Creating new achievement set %s\n", ach_set.c_str());
+        std::shared_ptr<AchievementSet> new_set = std::make_shared<AchievementSet>(this, ach_set);
+
+        auto pair = std::pair<std::string, std::shared_ptr<AchievementSet>>(ach_set, new_set);
+        achievement_sets.insert(pair);
+    }
+    achievement_sets.at(ach_set)->declareAchievement(achievement);
+
+}
+
+uint8_t* AchievementController::getRdram() {
+    return recomp_rdram;
+}
+
+void AchievementController::setRdram(uint8_t* p_recomp_rdram) {
+    recomp_rdram = p_recomp_rdram;
+}
+
+unsigned int AchievementController::getNumberOfSlots() {
+    return number_of_slots;
+}
+
+
+// Database Stuff:
 int AchievementController::initDatabase(fs::path p_path) {
     if (sqlite3_open(db_path.string().c_str(), &db) != SQLITE_OK) {
         printf("[AchievementNative] Failed init, can't open database: %s\n", sqlite3_errmsg(db));
@@ -27,10 +69,11 @@ int AchievementController::initDatabase(fs::path p_path) {
     const char *flag_sql = 
         "CREATE TABLE IF NOT EXISTS " DB_FLAG_TABLE " ("
         "ach_set TEXT,"
-        "key TEXT,"
+        "flag_id TEXT,"
         "slot INTEGER,"
         "value BLOB NOT NULL,"
-        "PRIMARY KEY(ach_set, key, slot)"
+        "sot_value BLOB NOT NULL,"
+        "PRIMARY KEY(ach_set, flag_id, slot)"
     ");";
     
     kvState = sqlite3_exec(db, flag_sql, 0, 0, 0) == SQLITE_OK;
@@ -43,9 +86,9 @@ int AchievementController::initDatabase(fs::path p_path) {
     const char *unlock_sql = 
         "CREATE TABLE IF NOT EXISTS " DB_UNLOCK_TABLE " ("
         "ach_set TEXT,"
-        "key TEXT,"
+        "achievement_id TEXT,"
         "unlocked INTEGER,"
-        "PRIMARY KEY(ach_set, key)"
+        "PRIMARY KEY(ach_set, achievement_id)"
     ");";
     
     kvState = sqlite3_exec(db, unlock_sql, 0, 0, 0) == SQLITE_OK;
@@ -80,52 +123,52 @@ int AchievementController::updateSavePath(fs::path p_path) {
     return kvState;
 }
 
-int AchievementController::setFlag(std::string ach_set, std::string key, int slot, size_t size, void* data) {
+int AchievementController::dbSetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data) {
     if (!kvState) {
-        PLOGE.printf("[AchievementNative] Failed SET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[AchievementNative] Failed SET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
         return 0;
     }
 
-    const char *sql = "INSERT INTO " DB_FLAG_TABLE " (ach_set, slot, key, value) VALUES (?, ?, ?, ?) ON CONFLICT(ach_set, key, slot) DO UPDATE SET value = excluded.value;";
+    const char *sql = "INSERT INTO " DB_FLAG_TABLE " (ach_set, slot, flag_id, value) VALUES (?, ?, ?, ?) ON CONFLICT(ach_set, flag_id, slot) DO UPDATE SET value = excluded.value;";
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
-        PLOGE.printf("[AchievementNative] Failed SET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed SET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
         return 0;
     }
     sqlite3_bind_text(stmt, 1, ach_set.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 2, slot);
-    sqlite3_bind_text(stmt, 3, key.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, flag_id.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_blob(stmt, 4, data, size, SQLITE_STATIC);
     int res = sqlite3_step(stmt) == SQLITE_DONE;
     if (!res) {
-        PLOGE.printf("[AchievementNative] Failed SET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed SET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 
     return res;
 }
 
-int AchievementController::getFlag(std::string ach_set, std::string key, int slot, size_t size, void* write_data) {
+int AchievementController::dbGetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* write_data) {
     if (!kvState) {
-        PLOGE.printf("[AchievementNative] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
         return 0;
     }
 
-    const char *sql = "SELECT value FROM " DB_FLAG_TABLE " WHERE ach_set = ? AND key = ? AND slot = ?;";
+    const char *sql = "SELECT value FROM " DB_FLAG_TABLE " WHERE ach_set = ? AND flag_id = ? AND slot = ?;";
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
-        PLOGE.printf("[AchievementNative] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
         return 0;
     }
     sqlite3_bind_text(stmt, 1, ach_set.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, key.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, flag_id.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 3, slot);
 
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         size_t stored_size = sqlite3_column_bytes(stmt, 0);
         if (stored_size != size) {  // Fail if sizes don't match
-            PLOGE.printf("[AchievementNative] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+            PLOGE.printf("[SQLite] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
             sqlite3_finalize(stmt);
             return 0;
         }
@@ -139,22 +182,22 @@ int AchievementController::getFlag(std::string ach_set, std::string key, int slo
     return 0;
 }
 
-int AchievementController::hasFlag(std::string ach_set, std::string key, int slot) {
+int AchievementController::dbHasFlag(std::string ach_set, std::string flag_id, unsigned int slot) {
     if (!kvState) {
-        PLOGE.printf("[AchievementNative] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
         return 0;
     }
 
-    const char *sql = "SELECT 1 FROM " DB_FLAG_TABLE " WHERE key = ? AND slot = ? LIMIT 1;";
+    const char *sql = "SELECT 1 FROM " DB_FLAG_TABLE " WHERE flag_id = ? AND slot = ? LIMIT 1;";
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
-        PLOGE.printf("[AchievementNative] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
         return 0;
     }
     
     sqlite3_bind_text(stmt, 1, ach_set.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, key.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, flag_id.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 3, slot);
 
     // Return 1 if the key exists, 0 otherwise
@@ -163,59 +206,60 @@ int AchievementController::hasFlag(std::string ach_set, std::string key, int slo
     return exists;
 }
 
-int AchievementController::deleteFlag(std::string ach_set, std::string key, int slot) {
+int AchievementController::dbDeleteFlag(std::string ach_set, std::string flag_id, unsigned int slot) {
     if (!kvState) {
-        PLOGE.printf("[AchievementNative] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
         return 0;
     }
 
-    const char *sql = "DELETE FROM " DB_FLAG_TABLE " REMOVE ach_set = ? AND key = ? AND slot = ?;";
+    const char *sql = "DELETE FROM " DB_FLAG_TABLE " REMOVE ach_set = ? AND flag_id = ? AND slot = ?;";
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
-        PLOGE.printf("[AchievementNative] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
         return 0;
     }
     sqlite3_bind_text(stmt, 1, ach_set.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, key.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, flag_id.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 3, slot);
     int res = sqlite3_step(stmt) == SQLITE_DONE;
     if (!res) {
-        PLOGE.printf("[AchievementNative] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), key.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[AchievementNative] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
     return res;
 }
 
-int AchievementController::deleteSlotFlags(int slot) {
+int AchievementController::dbDeleteSlotFlags(unsigned int slot) {
     if (!kvState) {
-        PLOGE.printf("[AchievementNative] Failed REMOVE slot %d: %s\n", slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed REMOVE slot %d: %s\n", slot, sqlite3_errmsg(db));
         return 0;
     }
 
     const char *sql = "DELETE FROM " DB_FLAG_TABLE " WHERE slot = ?;";
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
-        PLOGE.printf("[AchievementNative] Failed REMOVE slot %d: %s\n", slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed REMOVE slot %d: %s\n", slot, sqlite3_errmsg(db));
         return 0;
     }
     sqlite3_bind_int(stmt, 1, slot);
     int res = sqlite3_step(stmt) == SQLITE_DONE;
     if (!res) {
-        PLOGE.printf("[AchievementNative] Failed REMOVE slot %d: %s\n", slot, sqlite3_errmsg(db));
+        PLOGE.printf("[SQLite] Failed REMOVE slot %d: %s\n", slot, sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 
-    PLOGE.printf("[AchievementNative] REMOVE slot %d succeeded\n", slot);
+    PLOGE.printf("[SQLite] REMOVE slot %d succeeded\n", slot);
     return res;
 }
 
-int AchievementController::copySlotFlags(int new_slot, int old_slot) {
+int AchievementController::dbCopySlotFlags(unsigned int new_slot, unsigned int old_slot) {
     if (!kvState) {
         PLOGE.printf("[AchievementNative] Failed COPY slot %d -> slot %d: %s\n", old_slot, new_slot, sqlite3_errmsg(db));
         return 0;
     }
 
-    const char *sql = "Insert INTO " DB_FLAG_TABLE " (key, slot, value) SELECT key, ?, value FROM storage004 WHERE slot = ?";
+    const char *sql = "Insert INTO " DB_FLAG_TABLE " (ach_set, flag_id, slot, value) SELECT ach_set, flag_id, ?, value FROM "
+        DB_FLAG_TABLE " WHERE slot = ? ON CONFLICT(ach_set, flag_id, slot) DO UPDATE SET value = excluded.value;";
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
         PLOGE.printf("[AchievementNative] Failed COPY slot %d -> slot %d: %s\n", old_slot, new_slot, sqlite3_errmsg(db));
@@ -231,26 +275,51 @@ int AchievementController::copySlotFlags(int new_slot, int old_slot) {
     return res;
 }
 
-void AchievementController::declareAchievement(std::string ach_set, Achievement* achievement) {
-    if (!achievement_sets.contains(ach_set)) {
-        PLOGD.printf("Creating new achievement set %s\n", ach_set.c_str());
-        std::shared_ptr<AchievementSet> new_set = std::make_shared<AchievementSet>(this, ach_set);
-
-        auto pair = std::pair<std::string, std::shared_ptr<AchievementSet>>(ach_set, new_set);
-        achievement_sets.insert(pair);
+int AchievementController::dbSaveSOTValues(unsigned int slot) {
+    if (!kvState) {
+        PLOGE.printf("[SQLite] Failed SOT_SAVE for slot %d: %s\n", slot, sqlite3_errmsg(db));
+        return 0;
     }
-    achievement_sets.at(ach_set)->declareAchievement(achievement);
 
+    const char *sql = "UPDATE " DB_FLAG_TABLE " SET sot_value = value WHERE slot = ?;";
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
+        PLOGE.printf("[SQLite] Failed SOT_SAVE for slot %d: %s\n", slot, sqlite3_errmsg(db));
+        return 0;
+    }
+
+    sqlite3_bind_int(stmt, 1, slot);
+    int res = sqlite3_step(stmt) == SQLITE_DONE;
+    if (!res) {
+        PLOGE.printf("[SQLite] Failed SOT_SAVE for slot %d: %s\n", slot, sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(stmt);
+
+    PLOGE.printf("[SQLite] SOT_SAVE for slot %d succeeded\n", slot);
+    return res;
 }
 
-uint8_t* AchievementController::getRdram() {
-    return recomp_rdram;
+int AchievementController::dbRevertToSOTValues(unsigned int slot) {
+    if (!kvState) {
+        PLOGE.printf("[SQLite] Failed SOT_REVERT for slot %d: %s\n", slot, sqlite3_errmsg(db));
+        return 0;
+    }
+
+    const char *sql = "UPDATE " DB_FLAG_TABLE " SET sot_value = value WHERE slot = ?;";
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
+        PLOGE.printf("[SQLite] Failed SOT_REVERT for slot %d: %s\n", slot, sqlite3_errmsg(db));
+        return 0;
+    }
+
+    sqlite3_bind_int(stmt, 1, slot);
+    int res = sqlite3_step(stmt) == SQLITE_DONE;
+    if (!res) {
+        PLOGE.printf("[SQLite] Failed SOT_REVERT for slot %d: %s\n", slot, sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(stmt);
+
+    PLOGE.printf("[SQLite] SOT_REVERT for slot %d succeeded\n", slot);
+    return res;
 }
 
-void AchievementController::setRdram(uint8_t* p_recomp_rdram) {
-    recomp_rdram = p_recomp_rdram;
-}
-
-unsigned int AchievementController::getNumberOfSlots() {
-    return number_of_slots;
-}

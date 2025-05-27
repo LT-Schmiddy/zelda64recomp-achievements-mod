@@ -26,11 +26,9 @@ extern "C" {
 #endif
 
 typedef enum {
-    ACHIEVEMENT_FLAG_BOOLEAN,
     ACHIEVEMENT_FLAG_UNSIGNED_INT,
     ACHIEVEMENT_FLAG_SIGNED_INT,
     ACHIEVEMENT_FLAG_FLOAT,
-    // ACHIEVEMENT_FLAG_STRING,
     ACHIEVEMENT_FLAG_MAX,
     ACHIEVEMENT_FLAG_SIZE = 0xFFFFFFFF
 } AchievementFlagType;
@@ -66,9 +64,9 @@ typedef PACKED_STRUCT {
 
 #ifdef MIPS
 #include "modding.h"
-RECOMP_IMPORT(".", void AchievementLib_Init(unsigned int log_level, unsigned int number_of_save_slots, unsigned const char* savepath));
-RECOMP_IMPORT(".", void AchievementLib_Declare(const char* ach_set, Achievement* achievement));
-RECOMP_IMPORT(".", void AchievementLib_SetBooleanFlag(const char* achievement_id, ACH_U32 value));
+RECOMP_IMPORT(".", void AchievementNative_Init(unsigned int log_level, unsigned int number_of_save_slots, unsigned const char* savepath));
+RECOMP_IMPORT(".", void AchievementNative_Declare(const char* ach_set, Achievement* achievement));
+RECOMP_IMPORT(".", void AchievementNative_SetU32Flag(const char* ach_set, const char* ach_id, u32 slot, u32 value));
 #endif
 
 #ifdef __cplusplus

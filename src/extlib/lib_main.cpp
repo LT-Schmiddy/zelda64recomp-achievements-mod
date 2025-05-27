@@ -26,7 +26,7 @@ std::shared_ptr<AchievementController> controller = NULL;
 
 
 
-RECOMP_DLL_FUNC(AchievementLib_Init) {
+RECOMP_DLL_FUNC(AchievementNative_Init) {
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
     plog::init((plog::Severity)RECOMP_ARG(unsigned int, 0), &consoleAppender);
 
@@ -35,7 +35,7 @@ RECOMP_DLL_FUNC(AchievementLib_Init) {
     controller = std::make_shared<AchievementController>(rdram, number_of_slots, savepath);
 }
 
-RECOMP_DLL_FUNC(AchievementLib_Declare) {
+RECOMP_DLL_FUNC(AchievementNative_Declare) {
     std::string ach_set = RECOMP_ARG_STR(0);
     Achievement* achievement = RECOMP_ARG(Achievement*, 1);
     controller->setRdram(rdram);
@@ -44,9 +44,13 @@ RECOMP_DLL_FUNC(AchievementLib_Declare) {
 
 }
 
-RECOMP_DLL_FUNC(AchievementLib_SetBooleanFlag) {
-    std::string achievement_id = RECOMP_ARG_STR(0);
-    bool value = RECOMP_ARG(bool, 1);
+RECOMP_DLL_FUNC(AchievementNative_SetU32Flag) {
+    std::string achievement_set = RECOMP_ARG_STR(0);
+    std::string achievement_id = RECOMP_ARG_STR(1);
+    u32 slot = RECOMP_ARG(u32, 2);
+    u32 value = RECOMP_ARG(u32, 3);
+
+    controller->setU32Flag(achievement_set, achievement_id, slot, value);
 
     PLOGI.printf("Set Achievement '%s' to %i\n", achievement_id.c_str(), value);
 }

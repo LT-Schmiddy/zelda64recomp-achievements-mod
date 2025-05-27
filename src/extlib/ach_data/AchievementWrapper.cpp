@@ -1,3 +1,6 @@
+
+#include "plog/Log.h"
+
 #include "AchievementWrapper.hpp"
 
 #include "AchievementFlag.hpp"
@@ -25,4 +28,8 @@ std::string AchievementWrapper::getDescription(){
 void AchievementWrapper::addRequiredFlag(std::shared_ptr<AchievementFlag> flag) {
     auto flag_pair = std::pair<std::string, std::shared_ptr<AchievementFlag>>(flag->getId(), flag);
     required_flags.insert(flag_pair);
+}
+
+void AchievementWrapper::updateUnlock(unsigned int slot) {
+    PLOGI.printf("Updating achievement %s on slot %i", getId().c_str(), slot);
 }
