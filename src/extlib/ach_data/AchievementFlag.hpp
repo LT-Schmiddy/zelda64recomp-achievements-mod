@@ -1,10 +1,12 @@
+#pragma once
+
 #include <string>
 #include <vector>
 #include <memory>
 #include "lib_recomp.hpp"
 #include "achievements.h"
-#include "AchievementWrapper.hpp"
 
+class AchievementWrapper;
 
 class AchievementFlag {
 public:

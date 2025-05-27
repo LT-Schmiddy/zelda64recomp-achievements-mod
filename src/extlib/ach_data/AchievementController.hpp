@@ -1,7 +1,10 @@
+#pragma once
+
 #include <filesystem>
 #include <string>
-#include <map>
-#include "AchievementFlag.hpp"
+#include <unordered_map>
+
+class AchievementSet;
 
 #include "sqlite3.h"
 #include "lib_recomp.hpp"
@@ -28,13 +31,12 @@ public:
     int deleteSlotFlags(int slot);
     int copySlotFlags(int dst_slot, int src_slot);
 
-    void loadAchievement(Achievement* achievement);
+    void loadAchievement(std::string ach_set, Achievement* achievement);
 
 private:
     sqlite3* db;
     int kvState = -1;
     fs::path db_path;
 
-    std::map<std::string, std::shared_ptr<AchievementWrapper>> achievements;
-    std::map<std::string, std::shared_ptr<AchievementFlag>> achievements;
+    std::unordered_map<std::string, std::shared_ptr<AchievementSet>> achievement_sets;
 };

@@ -9,6 +9,7 @@ set(TARGET_NAME AchievementLib)
 include_directories("./offline_build")
 include_directories("./include/extlib")
 include_directories("./include/shared")
+include_directories("./src/extlib")
 
 add_library(${TARGET_NAME} SHARED)
 

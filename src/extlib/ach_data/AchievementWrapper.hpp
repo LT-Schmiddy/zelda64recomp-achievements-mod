@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include "lib_recomp.hpp"
 #include "achievements.h"

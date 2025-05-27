@@ -1,4 +1,8 @@
-#include "AchievementFlagStorage.hpp"
+#include "AchievementController.hpp"
+
+#include "AchievementWrapper.hpp"
+#include "AchievementFlag.hpp"
+#include "AchievementSet.hpp"
 
 AchievementController::AchievementController(fs::path p_path) {
     updateSavePath(p_path);
@@ -204,4 +208,16 @@ int AchievementController::copySlotFlags(int new_slot, int old_slot) {
     }
     sqlite3_finalize(stmt);
     return res;
+}
+
+void AchievementController::loadAchievement(std::string ach_set, Achievement* achievement) {
+    if (!achievement_sets.contains(ach_set)) {
+        // std::shared_ptr<AchievementSet> new_set = std::make_shared<AchievementSet>(this, ach_set);
+
+        // auto pair = std::pair<std::string, std::shared_ptr<AchievementSet>>(ach_set, new_set);
+
+        // achievement_sets.emplace(ach_set, this, ach_set);
+    }
+
+
 }
