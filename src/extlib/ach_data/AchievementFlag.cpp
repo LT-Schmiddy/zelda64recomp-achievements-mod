@@ -1,15 +1,11 @@
 #include "AchievementFlag.hpp"
 #include "AchievementController.hpp"
+#include "AchievementWrapper.hpp"
 
 AchievementFlag::AchievementFlag(AchievementController* p_controller, std::string p_ach_set, Achievement* p_achievement) {
     controller = p_controller;
     ach_set = p_ach_set;
     achievement = p_achievement;
-
-    if (!controller->hasFlag(ach_set, getId(), controller->getCurrentSlot())){
-        int value = 0;
-        controller->setFlag(ach_set, getId(), controller->getCurrentSlot(), sizeof(int), &value);
-    }
 }
 
 
@@ -32,5 +28,12 @@ AchievementFlagType AchievementFlag::getType() {
         return ACHIEVEMENT_FLAG_BOOLEAN;
     }
     return flag->type;
+}
+
+void AchievementFlag::addDependentAchievement(std::shared_ptr<AchievementWrapper> ach) {
+    auto pair = std::pair<std::string, std::shared_ptr<AchievementWrapper>>(ach->getId(), ach);
+
+    dependend_achievements.insert(pair);
+    printf("Achievement %s now depends on flag %s\n", ach->getId().c_str(), this->getId().c_str());
 }
 

@@ -22,7 +22,7 @@ int AchievementController::initDatabase(fs::path p_path) {
         return kvState;
     }
 
-    const char *sql = 
+    const char *flag_sql = 
         "CREATE TABLE IF NOT EXISTS " DB_FLAG_TABLE " ("
         "ach_set TEXT,"
         "key TEXT,"
@@ -31,11 +31,26 @@ int AchievementController::initDatabase(fs::path p_path) {
         "PRIMARY KEY(ach_set, key, slot)"
     ");";
     
-    kvState = sqlite3_exec(db, sql, 0, 0, 0) == SQLITE_OK;
+    kvState = sqlite3_exec(db, flag_sql, 0, 0, 0) == SQLITE_OK;
     if (!kvState) {
-        printf("[AchievementNative] Failed init, failed table creation: %s\n", sqlite3_errmsg(db));
+        printf("[AchievementNative] Failed init, failed table '%s' creation: %s\n", DB_FLAG_TABLE, sqlite3_errmsg(db));
     } else {
-        printf("[AchievementNative] Initialized\n");
+        printf("[AchievementNative] Initialized '%s'\n", DB_FLAG_TABLE);
+    }
+
+    const char *unlock_sql = 
+        "CREATE TABLE IF NOT EXISTS " DB_UNLOCK_TABLE " ("
+        "ach_set TEXT,"
+        "key TEXT,"
+        "unlocked INTEGER,"
+        "PRIMARY KEY(ach_set, key)"
+    ");";
+    
+    kvState = sqlite3_exec(db, unlock_sql, 0, 0, 0) == SQLITE_OK;
+    if (!kvState) {
+        printf("[AchievementNative] Failed init, failed table '%s' creation: %s\n", DB_UNLOCK_TABLE, sqlite3_errmsg(db));
+    } else {
+        printf("[AchievementNative] Initialized '%s'\n", DB_UNLOCK_TABLE);
     }
 
     return kvState;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 #include <memory>
 #include "lib_recomp.hpp"
 #include "achievements.h"
@@ -15,11 +15,14 @@ public:
     ~AchievementFlag();
     std::string getId();
     AchievementFlagType getType();
+
+    void addDependentAchievement(std::shared_ptr<AchievementWrapper> ach);
 private:
     AchievementController* controller = NULL;
     std::string ach_set;
     Achievement* achievement = NULL;
     AchievementFlagDefinition* flag = NULL;
-    std::vector<std::shared_ptr<AchievementWrapper>> used_by_achievements;
+
+    std::unordered_map<std::string,std::shared_ptr<AchievementWrapper>> dependend_achievements;
 
 };

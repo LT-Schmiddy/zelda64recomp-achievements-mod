@@ -12,6 +12,7 @@ class AchievementSet;
 
 #define DB_FILE_EXT ".AchievementNative.db"
 #define DB_FLAG_TABLE "AchievementFlag"
+#define DB_UNLOCK_TABLE "AchievementUnlock"
 
 namespace fs = std::filesystem;
 
