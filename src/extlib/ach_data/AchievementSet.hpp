@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <unordered_map>
 #include "achievements.h"
 
 class AchievementController;

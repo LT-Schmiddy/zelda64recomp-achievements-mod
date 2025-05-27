@@ -22,8 +22,9 @@ std::shared_ptr<AchievementController> controller = NULL;
 
 
 RECOMP_DLL_FUNC(AchievementLib_Init) {
-    fs::path savepath = fs::path(RECOMP_ARG_U8STR(0));
-    controller = std::make_shared<AchievementController>(rdram, savepath);
+    unsigned int number_of_slots = RECOMP_ARG(unsigned int, 0);
+    fs::path savepath = fs::path(RECOMP_ARG_U8STR(1));
+    controller = std::make_shared<AchievementController>(rdram, number_of_slots, savepath);
 }
 
 RECOMP_DLL_FUNC(AchievementLib_Declare) {

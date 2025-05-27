@@ -7,8 +7,9 @@
 #include "AchievementFlag.hpp"
 #include "AchievementSet.hpp"
 
-AchievementController::AchievementController(uint8_t* p_recomp_rdram, fs::path p_path) {
+AchievementController::AchievementController(uint8_t* p_recomp_rdram, int p_number_of_slots, fs::path p_path) {
     recomp_rdram = p_recomp_rdram;
+    number_of_slots = p_number_of_slots;
     updateSavePath(p_path);
 }
 
@@ -250,6 +251,6 @@ void AchievementController::setRdram(uint8_t* p_recomp_rdram) {
     recomp_rdram = p_recomp_rdram;
 }
 
-int AchievementController::getCurrentSlot() {
-    return current_slot;
+unsigned int AchievementController::getNumberOfSlots() {
+    return number_of_slots;
 }

@@ -30,9 +30,12 @@ typedef enum {
     ACHIEVEMENT_FLAG_UNSIGNED_INT,
     ACHIEVEMENT_FLAG_SIGNED_INT,
     ACHIEVEMENT_FLAG_FLOAT,
-    ACHIEVEMENT_FLAG_STRING,
-    ACHIEVEMENT_FLAG_MAX = 0xFFFFFFFF
+    // ACHIEVEMENT_FLAG_STRING,
+    ACHIEVEMENT_FLAG_MAX,
+    ACHIEVEMENT_FLAG_SIZE = 0xFFFFFFFF
 } AchievementFlagType;
+
+#define ACHIEVEMENT_FLAG_SIZE 4
 
 typedef PACKED_STRUCT {
     STRUCT_PTR(const char) id;
@@ -63,7 +66,7 @@ typedef PACKED_STRUCT {
 
 #ifdef MIPS
 #include "modding.h"
-RECOMP_IMPORT(".", void AchievementLib_Init(const char* savepath));
+RECOMP_IMPORT(".", void AchievementLib_Init(int number_of_save_slots, unsigned const char* savepath));
 RECOMP_IMPORT(".", void AchievementLib_Declare(const char* ach_set, Achievement* achievement));
 RECOMP_IMPORT(".", void AchievementLib_SetBooleanFlag(const char* achievement_id, ACH_U32 value));
 #endif

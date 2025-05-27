@@ -18,7 +18,7 @@ namespace fs = std::filesystem;
 
 class AchievementController {
 public: 
-    AchievementController(uint8_t* recomp_rdram, fs::path p_path);
+    AchievementController(uint8_t* p_recomp_rdram, int p_number_of_slots, fs::path p_path);
     ~AchievementController();
 
     int initDatabase(fs::path p_path);
@@ -36,11 +36,11 @@ public:
     void declareAchievement(std::string ach_set, Achievement* achievement);
     uint8_t* getRdram();
     void setRdram(uint8_t* p_recomp_rdram);
-    int getCurrentSlot();
+    unsigned int getNumberOfSlots();
 
 private:
     uint8_t* recomp_rdram = NULL;
-    int current_slot = 0;
+    unsigned int number_of_slots = 0;
     sqlite3* db;
     int kvState = -1;
     fs::path db_path;

@@ -17,11 +17,19 @@ public:
     AchievementFlagType getType();
 
     void addDependentAchievement(std::shared_ptr<AchievementWrapper> ach);
+
+    void loadFlagFromDb(int slot);
+    void saveFlagToDb(int slot);
+
+    
 private:
     AchievementController* controller = NULL;
     std::string ach_set;
     Achievement* achievement = NULL;
     AchievementFlagDefinition* flag = NULL;
+
+    size_t data_size = 0;
+    unsigned char** data = NULL;
 
     std::unordered_map<std::string,std::shared_ptr<AchievementWrapper>> dependend_achievements;
 

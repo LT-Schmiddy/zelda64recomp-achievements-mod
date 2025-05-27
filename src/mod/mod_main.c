@@ -12,8 +12,8 @@
 RECOMP_CALLBACK("*", recomp_on_init) void load_lib () {
     u32 count = GetAchievementCount();
     recomp_printf("NUMBER OF ACHIEVEMENTS: %i\n", count);
-    char* savepath = recomp_get_save_file_path();
-    AchievementLib_Init(savepath);
+    unsigned char* savepath = recomp_get_save_file_path();
+    AchievementLib_Init(2, savepath);
     recomp_free(savepath);
     // Recomp argument helpers don't support double pointers.
     // Passing achievements over one at a time for now.

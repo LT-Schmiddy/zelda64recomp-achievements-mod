@@ -187,6 +187,13 @@ else
 	- rm -rf $(ASSETS_EXTRACTED_DIR)
 endif
 
+clean-build:
+ifeq ($(OS),Windows_NT)
+	- rmdir "$(BUILD_DIR)" /s /q
+else
+	- rm -rf $(BUILD_DIR)
+endif
+
 -include $(C_DEPS)
 
-.PHONY: all runtime nrm native offline extlib-all extlib-win extlib-macos extlib-linux extlib-native clean
+.PHONY: all runtime nrm native offline extlib-all extlib-win extlib-macos extlib-linux extlib-native clean clean-build

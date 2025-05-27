@@ -14,7 +14,7 @@ AchievementSet::AchievementSet(AchievementController* p_controller, std::string 
 AchievementSet::~AchievementSet(){}
 
 void AchievementSet::declareAchievement(Achievement* achievement) {
-    printf("Adding achievement to set...\n");
+    printf("Adding achievement to set %s...\n", ach_set.c_str());
 
     // Create the default flag for the achievement:
     std::shared_ptr<AchievementFlag> new_flag = std::make_shared<AchievementFlag>(controller, ach_set, achievement);
