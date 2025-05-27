@@ -1,5 +1,6 @@
 #include "AchievementWrapper.hpp"
 
+#include "AchievementFlag.hpp"
 #include "AchievementController.hpp"
 
 
@@ -19,4 +20,9 @@ std::string AchievementWrapper::getDisplayName(){
 }
 std::string AchievementWrapper::getDescription(){
     return ptr_to_string(controller->getRdram(), (int32_t)achievement->description);
+}
+
+void AchievementWrapper::addRequiredFlag(std::shared_ptr<AchievementFlag> flag) {
+    auto flag_pair = std::pair<std::string, std::shared_ptr<AchievementFlag>>(flag->getId(), flag);
+    required_flags.insert(flag_pair);
 }

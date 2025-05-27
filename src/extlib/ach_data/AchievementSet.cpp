@@ -17,8 +17,8 @@ void AchievementSet::declareAchievement(Achievement* achievement) {
     printf("Adding achievement to set...\n");
 
     // Create the default flag for the achievement:
-    std::shared_ptr<AchievementFlag> flag = std::make_shared<AchievementFlag>(controller, ach_set, achievement);
-    auto flag_pair = std::pair<std::string, std::shared_ptr<AchievementFlag>>(flag->getId(), flag);
+    std::shared_ptr<AchievementFlag> new_flag = std::make_shared<AchievementFlag>(controller, ach_set, achievement);
+    auto flag_pair = std::pair<std::string, std::shared_ptr<AchievementFlag>>(new_flag->getId(), new_flag);
     flags.insert(flag_pair);
 
     // Create the achievement wrapper:
@@ -27,6 +27,6 @@ void AchievementSet::declareAchievement(Achievement* achievement) {
     achievments.insert(ach_pair);
 
     // Link 'em together:
-    flag->addDependentAchievement(new_ach);
-
+    new_flag->addDependentAchievement(new_ach);
+    new_ach->addRequiredFlag(new_flag); // TODO: handle additional flags... once those are implemented.
 }

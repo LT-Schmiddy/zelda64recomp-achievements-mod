@@ -18,11 +18,13 @@ public:
     std::string getDisplayName();
     std::string getDescription();
 
+    void addRequiredFlag(std::shared_ptr<AchievementFlag> flag);
+
 private:
 
     AchievementController* controller = NULL;
     std::string ach_set;
     Achievement* achievement = NULL;
 
-    std::unordered_map<std::string, std::shared_ptr<AchievementWrapper>> uses_flags;
+    std::unordered_map<std::string, std::shared_ptr<AchievementFlag>> required_flags;
 };
