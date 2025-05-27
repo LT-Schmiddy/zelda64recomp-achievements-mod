@@ -1,4 +1,5 @@
 #include <string.h>
+#include "plog/Log.h"
 
 #include "AchievementSet.hpp"
 
@@ -14,16 +15,18 @@ AchievementSet::AchievementSet(AchievementController* p_controller, std::string 
 AchievementSet::~AchievementSet(){}
 
 void AchievementSet::declareAchievement(Achievement* achievement) {
-    printf("Adding achievement to set %s...\n", ach_set.c_str());
 
     // Create the default flag for the achievement:
     std::shared_ptr<AchievementFlag> new_flag = std::make_shared<AchievementFlag>(controller, ach_set, achievement);
     auto flag_pair = std::pair<std::string, std::shared_ptr<AchievementFlag>>(new_flag->getId(), new_flag);
-    flags.insert(flag_pair);
+
 
     // Create the achievement wrapper:
     std::shared_ptr<AchievementWrapper> new_ach = std::make_shared<AchievementWrapper>(controller, ach_set, achievement);
     auto ach_pair = std::pair<std::string, std::shared_ptr<AchievementWrapper>>(new_ach->getId(), new_ach);
+
+    PLOGD.printf("Adding achievement '%s' to set '%s'...\n", new_ach->getId().c_str(), ach_set.c_str());
+    flags.insert(flag_pair);
     achievments.insert(ach_pair);
 
     // Link 'em together:

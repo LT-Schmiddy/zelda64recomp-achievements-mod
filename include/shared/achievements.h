@@ -66,7 +66,7 @@ typedef PACKED_STRUCT {
 
 #ifdef MIPS
 #include "modding.h"
-RECOMP_IMPORT(".", void AchievementLib_Init(int number_of_save_slots, unsigned const char* savepath));
+RECOMP_IMPORT(".", void AchievementLib_Init(unsigned int log_level, unsigned int number_of_save_slots, unsigned const char* savepath));
 RECOMP_IMPORT(".", void AchievementLib_Declare(const char* ach_set, Achievement* achievement));
 RECOMP_IMPORT(".", void AchievementLib_SetBooleanFlag(const char* achievement_id, ACH_U32 value));
 #endif
