@@ -8,6 +8,7 @@ class AchievementSet;
 
 #include "sqlite3.h"
 #include "lib_recomp.hpp"
+#include "achievements.h"
 
 #define DB_FILE_EXT ".AchievementNative.db"
 #define DB_FLAG_TABLE "AchievementFlag"
@@ -16,7 +17,7 @@ namespace fs = std::filesystem;
 
 class AchievementController {
 public: 
-    AchievementController(fs::path p_path);
+    AchievementController(uint8_t* recomp_rdram, fs::path p_path);
     ~AchievementController();
 
     int initDatabase(fs::path p_path);
@@ -31,9 +32,14 @@ public:
     int deleteSlotFlags(int slot);
     int copySlotFlags(int dst_slot, int src_slot);
 
-    void loadAchievement(std::string ach_set, Achievement* achievement);
+    void declareAchievement(std::string ach_set, Achievement* achievement);
+    uint8_t* getRdram();
+    void setRdram(uint8_t* p_recomp_rdram);
+    int getCurrentSlot();
 
 private:
+    uint8_t* recomp_rdram = NULL;
+    int current_slot = 0;
     sqlite3* db;
     int kvState = -1;
     fs::path db_path;

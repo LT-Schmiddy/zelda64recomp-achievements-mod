@@ -1,10 +1,14 @@
+#include <iostream>
+#include <string.h>
+
 #include "AchievementController.hpp"
 
 #include "AchievementWrapper.hpp"
 #include "AchievementFlag.hpp"
 #include "AchievementSet.hpp"
 
-AchievementController::AchievementController(fs::path p_path) {
+AchievementController::AchievementController(uint8_t* p_recomp_rdram, fs::path p_path) {
+    recomp_rdram = p_recomp_rdram;
     updateSavePath(p_path);
 }
 
@@ -210,14 +214,27 @@ int AchievementController::copySlotFlags(int new_slot, int old_slot) {
     return res;
 }
 
-void AchievementController::loadAchievement(std::string ach_set, Achievement* achievement) {
+void AchievementController::declareAchievement(std::string ach_set, Achievement* achievement) {
     if (!achievement_sets.contains(ach_set)) {
-        // std::shared_ptr<AchievementSet> new_set = std::make_shared<AchievementSet>(this, ach_set);
+        printf("Creating new achievement set %s\n", ach_set.c_str());
+        std::shared_ptr<AchievementSet> new_set = std::make_shared<AchievementSet>(this, ach_set);
 
-        // auto pair = std::pair<std::string, std::shared_ptr<AchievementSet>>(ach_set, new_set);
-
-        // achievement_sets.emplace(ach_set, this, ach_set);
+        auto pair = std::pair<std::string, std::shared_ptr<AchievementSet>>(ach_set, new_set);
+        achievement_sets.insert(pair);
     }
+    printf("Creating new achievement in %s\n", ach_set.c_str());
+    achievement_sets.at(ach_set)->declareAchievement(achievement);
 
+}
 
+uint8_t* AchievementController::getRdram() {
+    return recomp_rdram;
+}
+
+void AchievementController::setRdram(uint8_t* p_recomp_rdram) {
+    recomp_rdram = p_recomp_rdram;
+}
+
+int AchievementController::getCurrentSlot() {
+    return current_slot;
 }

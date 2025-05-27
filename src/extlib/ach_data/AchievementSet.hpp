@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include "achievements.h"
 
 class AchievementController;
 class AchievementFlag;
@@ -13,6 +14,8 @@ public:
     
     AchievementSet(AchievementController* p_controller, std::string p_ach_set);
     ~AchievementSet();
+
+    void declareAchievement(Achievement* achievement);
 
 private:
     

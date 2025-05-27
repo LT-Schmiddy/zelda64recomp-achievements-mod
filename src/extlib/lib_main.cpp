@@ -19,16 +19,18 @@ extern "C" {
 
 std::shared_ptr<AchievementController> controller = NULL;
 
-uint8_t* recomp_rdram = NULL;
+
 
 RECOMP_DLL_FUNC(AchievementLib_Init) {
-    recomp_rdram = rdram;
-    controller = std::make_shared()
+    fs::path savepath = fs::path(RECOMP_ARG_U8STR(0));
+    controller = std::make_shared<AchievementController>(rdram, savepath);
 }
 
 RECOMP_DLL_FUNC(AchievementLib_Declare) {
-    Achievement* achievement = RECOMP_ARG(Achievement*, 0);
-
+    std::string ach_set = RECOMP_ARG_STR(0);
+    Achievement* achievement = RECOMP_ARG(Achievement*, 1);
+    controller->setRdram(rdram);
+    controller->declareAchievement(ach_set, achievement);
     printf("Achievement ID: %s\n", ptr_to_string(rdram, (PTR(const char*))achievement->id).c_str());
 
 }

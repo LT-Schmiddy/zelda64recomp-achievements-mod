@@ -1,6 +1,6 @@
 BUILD_DIR := build
 MOD_TOML := ./mod.toml
-LIB_NAME := AchievementLib
+LIB_NAME := AchievementNative
 LIB_PREFIX := lib
 ASSETS_EXTRACTED_DIR ?= assets_extracted
 ASSETS_INCLUDE_DIR ?= assets_extracted/assets
@@ -102,7 +102,7 @@ CPPFLAGS := -nostdinc -D_LANGUAGE_C -DMIPS -DF3DEX_GBI_2 -DF3DEX_GBI_PL -DGBI_DO
 			-I assets_extracted -I assets_extracted/assets -I assets_extracted/assets/assets
 LDFLAGS  := -nostdlib -T $(LDSCRIPT) -Map $(BUILD_DIR)/mod.map --unresolved-symbols=ignore-all --emit-relocs -e 0 --no-nmagic
 
-C_SRCS := $(wildcard src/mod/*.c) $(wildcard src/mod/achievement_hooks/*.c)
+C_SRCS := $(wildcard src/mod/*.c) $(wildcard src/lib/*.c) $(wildcard src/mod/achievement_hooks/*.c)
 C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.o))
 C_DEPS := $(addprefix $(BUILD_DIR)/, $(C_SRCS:.c=.d))
 

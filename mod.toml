@@ -42,7 +42,7 @@ dependencies = [
 # Native libraries (e.g. DLLs) and the functions they export.
 native_libraries = [
 # Example native library:
-   { name = "AchievementLib", funcs = [
+   { name = "AchievementNative", funcs = [
       "AchievementLib_Init",
       "AchievementLib_Declare"
    ] }
