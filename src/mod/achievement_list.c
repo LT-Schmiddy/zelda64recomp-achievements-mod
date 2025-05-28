@@ -841,6 +841,43 @@ Achievement gAchievements[] = {
         },
         NULL
     },
+    // Misc Unlocks
+    {
+        "get_magic",
+        "Get Magic",
+        "Return the Stray Fairy in Clock Town to the Great Fairy Fountain in North Clock Town.",
+        NULL,
+        NULL,
+        NULL,
+        {
+            0
+        },
+        NULL
+    },
+    {
+        "get_magic_double",
+        "Get Double Magic",
+        "Get rewarded with the second Magic Upgrade after returning all the Stray Fairies from Snowhead Temple to the Fairy's Fountain in Snowhead.",
+        NULL,
+        NULL,
+        NULL,
+        {
+            0
+        },
+        NULL
+    },
+    {
+        "get_double_defense",
+        "Get Double Defense",
+        "Get rewarded with the Double Defense Upgrade after returning all the Stray Fairies from Great Bay Temple to the Fairy's Fountain in Zora Cape.",
+        NULL,
+        NULL,
+        NULL,
+        {
+            0
+        },
+        NULL
+    },
     // Challenges
     {   // missable
         "break_razor_sword",
