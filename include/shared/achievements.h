@@ -67,6 +67,7 @@ typedef PACKED_STRUCT {
 RECOMP_IMPORT(".", void AchievementNative_Init(unsigned int log_level, unsigned int number_of_save_slots, unsigned const char* savepath));
 RECOMP_IMPORT(".", void AchievementNative_Declare(const char* ach_set, Achievement* achievement));
 RECOMP_IMPORT(".", void AchievementNative_SetU32Flag(const char* ach_set, const char* ach_id, u32 slot, u32 value));
+RECOMP_IMPORT(".", Achievement* AchievementNative_GetNextAchievementUnlock());
 #endif
 
 #ifdef __cplusplus

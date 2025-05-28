@@ -31,9 +31,19 @@ void AchievementWrapper::addRequiredFlag(std::shared_ptr<AchievementFlag> flag) 
 }
 
 void AchievementWrapper::updateUnlock(unsigned int slot) {
+    // No need to process an already unlocked achievement.
+    if (is_unlocked) {
+        return;
+    }
+
     PLOGI.printf("Updating achievement %s on slot %i", getId().c_str(), slot);
-    if (recomp_address == 0) {
-        bool unlocked = standardIsUnlocked(slot);
+    if (getNativePtr()->script == 0) {
+        is_unlocked = standardIsUnlocked(slot);
+    }
+
+    if(is_unlocked) {
+        controller->dbSetAchievement(ach_set, getId(), true);
+        controller->enqueueAchievementUnlock(recomp_address);
     }
 }
 

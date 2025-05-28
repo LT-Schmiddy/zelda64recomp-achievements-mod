@@ -31,10 +31,16 @@ public:
     void setF32Flag(std::string ach_set, std::string flag_id, unsigned int slot, float value);
 
     void declareAchievement(std::string ach_set, PTR(Achievement) achievement);
+    void enqueueAchievementUnlock(PTR(Achievement) achievement);
+    PTR(Achievement) getNextAchievementUnlock();
+    
     // Database Handling:
-
     int initDatabase(fs::path p_path);
     int updateSavePath(fs::path p_path);
+
+    int dbSetAchievement(std::string ach_set, std::string flag_id, int unlocked);
+    // int dbGetAchievement(std::string ach_set, std::string flag_id);
+    // int dbHasAchievement(std::string ach_set, std::string flag_id);
 
     int dbSetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data);
     int dbGetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* write_data);

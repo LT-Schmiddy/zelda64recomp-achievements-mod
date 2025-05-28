@@ -26,6 +26,17 @@ RECOMP_CALLBACK("*", recomp_on_init) void load_lib () {
 
 }
 
+RECOMP_CALLBACK("*", recomp_on_play_main)  void display_achievement_unlocks (PlayState* play) {
+    while(true) {
+        Achievement* unlocked = AchievementNative_GetNextAchievementUnlock();
+        if (unlocked == NULL) {
+            return;
+        }
+
+        recomp_printf("Achievement Unlocked: %s\n", unlocked->display_name);
+    }
+}
+
 void Achievements_SetU32Flag(const char* ach_set, const char* ach_id, u32 slot, u32 value) {
     AchievementNative_SetU32Flag(ach_set, ach_id, slot, value);
 }

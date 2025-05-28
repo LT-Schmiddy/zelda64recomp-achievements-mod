@@ -52,3 +52,11 @@ RECOMP_DLL_FUNC(AchievementNative_SetU32Flag) {
 
     // PLOGI.printf("Set Achievement '%s' to %i\n", achievement_id.c_str(), value);
 }
+
+RECOMP_DLL_FUNC(AchievementNative_GetNextAchievementUnlock) {
+
+
+    RECOMP_RETURN(PTR(Achievement), controller->getNextAchievementUnlock());
+
+    // PLOGI.printf("Set Achievement '%s' to %i\n", achievement_id.c_str(), value);
+}

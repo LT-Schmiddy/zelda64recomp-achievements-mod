@@ -46,6 +46,7 @@ native_libraries = [
       "AchievementNative_Init",
       "AchievementNative_Declare",
       "AchievementNative_SetU32Flag",
+      "AchievementNative_GetNextAchievementUnlock",
    ] }
 ]
 
