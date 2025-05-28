@@ -11,6 +11,8 @@ AchievementWrapper::AchievementWrapper(AchievementController* p_controller, std:
     controller = p_controller;
     ach_set = p_ach_set;
     recomp_address = p_achievement;
+    // This constructor is called during initialization, so it's the perfect time to load this info from the disk.
+    is_unlocked = controller->dbGetAchievementUnlocked(ach_set, getId());
 }
 
 AchievementWrapper::~AchievementWrapper(){}
@@ -36,13 +38,13 @@ void AchievementWrapper::updateUnlock(unsigned int slot) {
         return;
     }
 
-    PLOGI.printf("Updating achievement %s on slot %i", getId().c_str(), slot);
+    PLOGD.printf("Updating achievement %s on slot %i", getId().c_str(), slot);
     if (getNativePtr()->script == 0) {
         is_unlocked = standardIsUnlocked(slot);
     }
 
     if(is_unlocked) {
-        controller->dbSetAchievement(ach_set, getId(), true);
+        controller->dbSetAchievementUnlocked(ach_set, getId(), true);
         controller->enqueueAchievementUnlock(recomp_address);
     }
 }
@@ -81,5 +83,5 @@ bool AchievementWrapper::standardIsUnlocked(unsigned int slot) {
 
 Achievement* AchievementWrapper::getNativePtr() {
     uint8_t* rdram = controller->getRdram();
-    return TO_PTR(Achievement, recomp_address);
+    return RDRAM_TO_PTR(rdram, Achievement, recomp_address);
 }

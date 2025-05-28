@@ -1,0 +1,9 @@
+Save functions to hook:
+
+Sram_ResetSaveFromMoonCrash
+Sram_OpenSave (check for Owl Save).
+Sram_SaveEndOfCycle
+Sram_EraseSave
+Sram_CopySave
+Sram_SaveSpecialEnterClockTown
+Sram_SaveSpecialNewDay

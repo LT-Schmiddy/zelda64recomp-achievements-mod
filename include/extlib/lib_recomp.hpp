@@ -23,6 +23,7 @@ extern "C" {
 #include <string>
 #include <stdint.h>
 
+#define RDRAM_TO_PTR(rdram, type, var) ((type*)(&rdram[(uint64_t)var - 0xFFFFFFFF80000000]))
 #define TO_PTR(type, var) ((type*)(&rdram[(uint64_t)var - 0xFFFFFFFF80000000]))
 #define PTR(x) int32_t
 

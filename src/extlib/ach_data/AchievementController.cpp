@@ -137,64 +137,59 @@ int AchievementController::updateSavePath(fs::path p_path) {
 }
 
 
-int AchievementController::dbSetAchievement(std::string ach_set, std::string flag_id, int unlocked) {
+int AchievementController::dbSetAchievementUnlocked(std::string ach_set, std::string achievement_id, int unlocked) {
     if (!kvState) {
-        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed SET %s (ach_set %s): %s\n", ach_set.c_str(), flag_id.c_str(), sqlite3_errmsg(db));
+        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed SET %s (ach_set %s): %s\n", ach_set.c_str(), achievement_id.c_str(), sqlite3_errmsg(db));
         return 0;
     }
 
     const char *sql = "INSERT INTO " DB_UNLOCK_TABLE " (ach_set, achievement_id, unlocked) VALUES (?, ?, ?) ON CONFLICT(ach_set, achievement_id) DO UPDATE SET unlocked = excluded.unlocked;";
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
-        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed SET %s (ach_set %s): %s\n", ach_set.c_str(), flag_id.c_str(), sqlite3_errmsg(db));
+        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed SET %s (ach_set %s): %s\n", ach_set.c_str(), achievement_id.c_str(), sqlite3_errmsg(db));
         return 0;
     }
     sqlite3_bind_text(stmt, 1, ach_set.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, flag_id.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, achievement_id.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_int(stmt, 3, unlocked);
     int res = sqlite3_step(stmt) == SQLITE_DONE;
     if (!res) {
-        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed SET %s (ach_set %s): %s\n", ach_set.c_str(), flag_id.c_str(), sqlite3_errmsg(db));
+        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed SET %s (ach_set %s): %s\n", ach_set.c_str(), achievement_id.c_str(), sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
 
     return res;
 }
-/*
-int AchievementController::dbGetAchievement(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* write_data) {
+
+int AchievementController::dbGetAchievementUnlocked(std::string ach_set, std::string achievement_id) {
     if (!kvState) {
-        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed GET %s (ach_set %s): %s\n", ach_set.c_str(), achievement_id.c_str(), sqlite3_errmsg(db));
         return 0;
     }
 
-    const char *sql = "SELECT value FROM " DB_FLAG_TABLE " WHERE ach_set = ? AND flag_id = ? AND slot = ?;";
+    const char *sql = "SELECT unlocked FROM " DB_UNLOCK_TABLE " WHERE ach_set = ? AND achievement_id = ?;";
     sqlite3_stmt *stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
-        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
+        PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed GET %s (ach_set %s): %s\n", ach_set.c_str(), achievement_id.c_str(), sqlite3_errmsg(db));
         return 0;
     }
     sqlite3_bind_text(stmt, 1, ach_set.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, flag_id.c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 3, slot);
+    sqlite3_bind_text(stmt, 2, achievement_id.c_str(), -1, SQLITE_STATIC);
 
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        size_t stored_size = sqlite3_column_bytes(stmt, 0);
-        if (stored_size != size) {  // Fail if sizes don't match
-            PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed GET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
-            sqlite3_finalize(stmt);
-            return 0;
-        }
-        memcpy(write_data, sqlite3_column_blob(stmt, 0), stored_size);
+        
+        int unlocked = sqlite3_column_int(stmt, 0);
         sqlite3_finalize(stmt);
-        return 1;
+        return unlocked;
     }
 
     // No need to log this I don't think?
     sqlite3_finalize(stmt);
+    // If there's no entry, we can assume the achievement wasn't unlocked.
     return 0;
 }
-
+/*
 int AchievementController::dbHasAchievement(std::string ach_set, std::string flag_id, unsigned int slot) {
     if (!kvState) {
         PLOGE.printf("[" DB_UNLOCK_TABLE "] Failed REMOVE %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));

@@ -38,8 +38,8 @@ public:
     int initDatabase(fs::path p_path);
     int updateSavePath(fs::path p_path);
 
-    int dbSetAchievement(std::string ach_set, std::string flag_id, int unlocked);
-    // int dbGetAchievement(std::string ach_set, std::string flag_id);
+    int dbSetAchievementUnlocked(std::string ach_set, std::string achievement_id, int unlocked);
+    int dbGetAchievementUnlocked(std::string ach_set, std::string achievement_id);
     // int dbHasAchievement(std::string ach_set, std::string flag_id);
 
     int dbSetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data);
