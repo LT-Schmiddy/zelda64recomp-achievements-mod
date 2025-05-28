@@ -11,21 +11,24 @@ class AchievementFlag;
 
 class AchievementWrapper {
 public:
-    AchievementWrapper(AchievementController* p_controller, std::string p_ach_set, Achievement* p_achievement);
+    AchievementWrapper(AchievementController* p_controller, std::string p_ach_set, PTR(Achievement) p_achievement);
     ~AchievementWrapper();
 
     std::string getId();
     std::string getDisplayName();
     std::string getDescription();
 
+    Achievement* getNativePtr();
     void addRequiredFlag(std::shared_ptr<AchievementFlag> flag);
     void updateUnlock(unsigned int slot);
+    bool standardIsUnlocked(unsigned int slot);
 
 private:
-
     AchievementController* controller = NULL;
     std::string ach_set;
-    Achievement* achievement = NULL;
-
+    PTR(Achievement) recomp_address = 0;
+    bool is_unlocked = false;
     std::unordered_map<std::string, std::shared_ptr<AchievementFlag>> required_flags;
+
+
 };

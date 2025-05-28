@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <string>
 #include <unordered_map>
+#include <queue>
 
 class AchievementSet;
 
@@ -25,13 +26,11 @@ public:
     void setRdram(uint8_t* p_recomp_rdram);
     unsigned int getNumberOfSlots();
 
-
-
     void setU32Flag(std::string ach_set, std::string flag_id, unsigned int slot, unsigned int value);
     void setS32Flag(std::string ach_set, std::string flag_id, unsigned int slot, int value);
     void setF32Flag(std::string ach_set, std::string flag_id, unsigned int slot, float value);
 
-    void declareAchievement(std::string ach_set, Achievement* achievement);
+    void declareAchievement(std::string ach_set, PTR(Achievement) achievement);
     // Database Handling:
 
     int initDatabase(fs::path p_path);
@@ -55,4 +54,5 @@ private:
     fs::path db_path;
 
     std::unordered_map<std::string, std::shared_ptr<AchievementSet>> achievement_sets;
+    std::queue<PTR(Achievement)> unlocked_queue;
 };

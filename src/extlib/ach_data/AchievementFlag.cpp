@@ -67,13 +67,13 @@ void AchievementFlag::loadDefaultValue(unsigned int slot) {
     (*data[slot]) = 0;
 }
 
-void AchievementFlag::writeValue(unsigned int slot, void* addr) {
+void AchievementFlag::setValue(unsigned int slot, void* addr) {
     memcpy(&data[slot], addr, data_size);
     // PLOGI.printf("Slot now equals = %i\n", (int)data[slot][3]);
     saveToDb(slot);
 }
 
-void AchievementFlag::readValue(unsigned int slot, void* addr) {
+void AchievementFlag::getValue(unsigned int slot, void* addr) {
     memcpy(addr, &data[slot], data_size);
 }
 

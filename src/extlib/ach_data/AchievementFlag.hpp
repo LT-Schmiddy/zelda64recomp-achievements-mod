@@ -23,8 +23,8 @@ public:
 
     void loadDefaultValue(unsigned int slot);
 
-    void writeValue(unsigned int slot, void* addr);
-    void readValue(unsigned int slot, void* addr);
+    void setValue(unsigned int slot, void* addr);
+    void getValue(unsigned int slot, void* addr);
     void updateAchievements(unsigned int slot);
 
     

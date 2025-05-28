@@ -20,7 +20,7 @@ void AchievementController::setU32Flag(std::string ach_set, std::string flag_id,
     std::shared_ptr<AchievementSet> set = achievement_sets.at(ach_set);
     std::shared_ptr<AchievementFlag> flag = set->getFlag(flag_id);
 
-    flag->writeValue(slot, &value);
+    flag->getValue(slot, &value);
     flag->updateAchievements(slot);
 }
 
@@ -33,7 +33,7 @@ void AchievementController::setF32Flag(std::string ach_set, std::string flag_id,
 }
 
 // Achievement Setup:
-void AchievementController::declareAchievement(std::string ach_set, Achievement* achievement) {
+void AchievementController::declareAchievement(std::string ach_set, PTR(Achievement) achievement) {
     if (!achievement_sets.contains(ach_set)) {
         PLOGD.printf("Creating new achievement set %s\n", ach_set.c_str());
         std::shared_ptr<AchievementSet> new_set = std::make_shared<AchievementSet>(this, ach_set);
@@ -122,6 +122,8 @@ int AchievementController::updateSavePath(fs::path p_path) {
     }
     return kvState;
 }
+
+
 
 int AchievementController::dbSetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data) {
     if (!kvState) {

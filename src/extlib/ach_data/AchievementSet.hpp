@@ -5,6 +5,7 @@
 #include <memory>
 #include <unordered_map>
 #include "achievements.h"
+#include "lib_recomp.hpp"
 
 class AchievementController;
 class AchievementFlag;
@@ -16,7 +17,7 @@ public:
     AchievementSet(AchievementController* p_controller, std::string p_ach_set);
     ~AchievementSet();
 
-    void declareAchievement(Achievement* achievement);
+    void declareAchievement(PTR(Achievement) achievement);
     std::shared_ptr<AchievementFlag> getFlag(std::string flag_id);
 
 private:

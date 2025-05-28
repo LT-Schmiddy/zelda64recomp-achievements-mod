@@ -37,11 +37,9 @@ RECOMP_DLL_FUNC(AchievementNative_Init) {
 
 RECOMP_DLL_FUNC(AchievementNative_Declare) {
     std::string ach_set = RECOMP_ARG_STR(0);
-    Achievement* achievement = RECOMP_ARG(Achievement*, 1);
+    PTR(Achievement) achievement = RECOMP_ARG(PTR(Achievement), 1);
     controller->setRdram(rdram);
     controller->declareAchievement(ach_set, achievement);
-    PLOGV.printf("Achievement ID: %s\n", ptr_to_string(rdram, (PTR(const char*))achievement->id).c_str());
-
 }
 
 RECOMP_DLL_FUNC(AchievementNative_SetU32Flag) {
@@ -52,5 +50,5 @@ RECOMP_DLL_FUNC(AchievementNative_SetU32Flag) {
 
     controller->setU32Flag(achievement_set, achievement_id, slot, value);
 
-    PLOGI.printf("Set Achievement '%s' to %i\n", achievement_id.c_str(), value);
+    // PLOGI.printf("Set Achievement '%s' to %i\n", achievement_id.c_str(), value);
 }
