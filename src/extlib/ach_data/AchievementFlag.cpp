@@ -11,9 +11,16 @@ AchievementFlag::AchievementFlag(AchievementController* p_controller, std::strin
     
     data_size = ACHIEVEMENT_FLAG_SIZE;
     data = new unsigned char*[controller->getNumberOfSlots()];
+    sot_data = new unsigned char*[controller->getNumberOfSlots()];
+
+    // Loading initializing all slots;
     for (unsigned i = 0; i < controller->getNumberOfSlots(); i++) {
         data[i] = new unsigned char[ACHIEVEMENT_FLAG_SIZE];
+        sot_data[i] = new unsigned char[ACHIEVEMENT_FLAG_SIZE];
         loadDefaultValue(i);
+        loadDefaultValueSOT(i);
+
+        controller->dbInitFlag(ach_set, getId(), i, data_size, data[i], sot_data[i]);
     }
 }
 
@@ -51,30 +58,21 @@ void AchievementFlag::addDependentAchievement(std::shared_ptr<AchievementWrapper
     // printf("Achievement %s now depends on flag %s\n", ach->getId().c_str(), this->getId().c_str());
 }
 
-void AchievementFlag::loadFromDb(unsigned int slot) {
-    if (controller->dbHasFlag(ach_set, getId(), slot)) {
-        controller->dbGetFlag(ach_set, getId(), slot, data_size, &data[slot]);
-    }
-    // We've already set the loaded slot to it's default value. No special processing is needed for
-    // flags not in the database yet.
-}
-
-void AchievementFlag::saveToDb(unsigned int slot) {
-    controller->dbSetFlag(ach_set, getId(), slot, data_size, &data[slot]);
-}
-
 void AchievementFlag::loadDefaultValue(unsigned int slot) {
     (*data[slot]) = 0;
 }
 
+void AchievementFlag::loadDefaultValueSOT(unsigned int slot) {
+    (*sot_data[slot]) = 0;
+}
+
 void AchievementFlag::setValue(unsigned int slot, void* addr) {
-    memcpy(&data[slot], addr, data_size);
-    // PLOGI.printf("Slot now equals = %i\n", (int)data[slot][3]);
-    saveToDb(slot);
+    memcpy(data[slot], addr, data_size);
+
 }
 
 void AchievementFlag::getValue(unsigned int slot, void* addr) {
-    memcpy(addr, &data[slot], data_size);
+    memcpy(addr, data[slot], data_size);
 }
 
 void AchievementFlag::updateAchievements(unsigned int slot) {
@@ -82,4 +80,16 @@ void AchievementFlag::updateAchievements(unsigned int slot) {
     for (auto iter: dependent_achievements){
         iter.second->updateUnlock(slot);
     }
+}
+
+void AchievementFlag::loadSlotFromDisk(unsigned int slot) {
+    if (controller->dbHasFlag(ach_set, getId(), slot)) {
+        controller->dbGetFlag(ach_set, getId(), slot, data_size, data[slot], sot_data[slot]);
+    }
+    // We've already set the loaded slot to it's default value. No special processing is needed for
+    // flags not in the database yet.
+}
+
+void AchievementFlag::saveSlotToDisk(unsigned int slot) {
+    controller->dbSetFlag(ach_set, getId(), slot, data_size, data[slot], sot_data[slot]);
 }

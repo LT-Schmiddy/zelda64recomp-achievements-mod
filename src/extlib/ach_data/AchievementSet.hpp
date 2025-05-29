@@ -20,6 +20,10 @@ public:
     void declareAchievement(PTR(Achievement) achievement);
     std::shared_ptr<AchievementFlag> getFlag(std::string flag_id);
 
+    void loadSlotFromDisk(unsigned int slot);
+    void saveSlotToDisk(unsigned int slot);
+
+
 private:
     
     AchievementController* controller = NULL;

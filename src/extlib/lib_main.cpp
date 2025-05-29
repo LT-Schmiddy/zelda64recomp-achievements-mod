@@ -56,3 +56,24 @@ RECOMP_DLL_FUNC(AchievementNative_SetU32Flag) {
 RECOMP_DLL_FUNC(AchievementNative_GetNextAchievementUnlock) {
     RECOMP_RETURN(PTR(Achievement), controller->getNextAchievementUnlock());
 }
+
+RECOMP_DLL_FUNC(AchievementNative_WriteFlagsToDisk) {
+    unsigned int slot = RECOMP_ARG(unsigned int, 0);
+    controller->saveSlotToDisk(slot);
+}
+
+RECOMP_DLL_FUNC(AchievementNative_ReadFlagsFromDisk) {
+    unsigned int slot = RECOMP_ARG(unsigned int, 0);
+    controller->loadSlotFromDisk(slot);
+}
+
+RECOMP_DLL_FUNC(AchievementNative_MakeDiskSOTState) {
+    unsigned int slot = RECOMP_ARG(unsigned int, 0);
+    controller->dbMakeDiskSOTValues(slot);
+}
+
+RECOMP_DLL_FUNC(AchievementNative_RevertDiskToSOTState) {
+    unsigned int slot = RECOMP_ARG(unsigned int, 0);
+    controller->dbRevertDiskToSOTValues(slot);
+}
+

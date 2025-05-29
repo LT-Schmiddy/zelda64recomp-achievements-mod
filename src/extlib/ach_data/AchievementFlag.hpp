@@ -18,14 +18,15 @@ public:
 
     void addDependentAchievement(std::shared_ptr<AchievementWrapper> ach);
 
-    void loadFromDb(unsigned int slot);
-    void saveToDb(unsigned int slot);
-
     void loadDefaultValue(unsigned int slot);
+    void loadDefaultValueSOT(unsigned int slot);
 
     void setValue(unsigned int slot, void* addr);
     void getValue(unsigned int slot, void* addr);
     void updateAchievements(unsigned int slot);
+
+    void loadSlotFromDisk(unsigned int slot);
+    void saveSlotToDisk(unsigned int slot);
 
     
 private:
@@ -36,6 +37,7 @@ private:
 
     size_t data_size = 0;
     unsigned char** data = NULL;
+    unsigned char** sot_data = NULL;
 
     std::unordered_map<std::string,std::shared_ptr<AchievementWrapper>> dependent_achievements;
 

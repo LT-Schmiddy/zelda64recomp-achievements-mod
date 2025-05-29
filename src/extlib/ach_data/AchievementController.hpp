@@ -42,15 +42,19 @@ public:
     int dbGetAchievementUnlocked(std::string ach_set, std::string achievement_id);
     // int dbHasAchievement(std::string ach_set, std::string flag_id);
 
-    int dbSetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data);
-    int dbGetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* write_data);
+    int dbInitFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data, void* sot_data);
+    int dbSetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data, void* sot_data);
+    int dbGetFlag(std::string ach_set, std::string flag_id, unsigned int slot, size_t size, void* data, void* sot_data);
     int dbHasFlag(std::string ach_set, std::string flag_id, unsigned int slot);
     int dbDeleteFlag(std::string ach_set, std::string flag_id, unsigned int slot);
     int dbDeleteSlotFlags(unsigned int slot);
     int dbCopySlotFlags(unsigned int dst_slot, unsigned int src_slot);
 
-    int dbSaveSOTValues(unsigned int slot);
-    int dbRevertToSOTValues(unsigned int slot);
+    int dbMakeDiskSOTValues(unsigned int slot);
+    int dbRevertDiskToSOTValues(unsigned int slot);
+
+    void loadSlotFromDisk(unsigned int slot);
+    void saveSlotToDisk(unsigned int slot);
 
 private:
     uint8_t* recomp_rdram = NULL;

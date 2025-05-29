@@ -36,3 +36,14 @@ void AchievementSet::declareAchievement(PTR(Achievement) achievement) {
     new_flag->addDependentAchievement(new_ach);
     new_ach->addRequiredFlag(new_flag); // TODO: handle additional flags... once those are implemented.
 }
+
+void AchievementSet::loadSlotFromDisk(unsigned int slot) {
+    for (auto iter : flags) {
+        iter.second->loadSlotFromDisk(slot);
+    }
+}
+void AchievementSet::saveSlotToDisk(unsigned int slot) {
+        for (auto iter : flags) {
+        iter.second->saveSlotToDisk(slot);
+    }
+}
