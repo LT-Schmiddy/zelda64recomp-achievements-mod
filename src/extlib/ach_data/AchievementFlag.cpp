@@ -20,7 +20,7 @@ AchievementFlag::AchievementFlag(AchievementController* p_controller, std::strin
         loadDefaultValue(i);
         loadDefaultValueSOT(i);
 
-        controller->dbInitFlag(ach_set, getId(), i, data_size, data[i], sot_data[i]);
+        // controller->dbInitFlag(ach_set, getId(), i, data_size, data[i], sot_data[i]);
     }
 }
 
@@ -68,6 +68,7 @@ void AchievementFlag::loadDefaultValueSOT(unsigned int slot) {
 
 void AchievementFlag::setValue(unsigned int slot, void* addr) {
     memcpy(data[slot], addr, data_size);
+    was_updated = true;
 
 }
 
@@ -83,13 +84,17 @@ void AchievementFlag::updateAchievements(unsigned int slot) {
 }
 
 void AchievementFlag::loadSlotFromDisk(unsigned int slot) {
-    if (controller->dbHasFlag(ach_set, getId(), slot)) {
-        controller->dbGetFlag(ach_set, getId(), slot, data_size, data[slot], sot_data[slot]);
-    }
+    // if (controller->dbHasFlag(ach_set, getId(), slot)) {
+    controller->dbGetFlag(ach_set, getId(), slot, data_size, data[slot], sot_data[slot]);
+    // }
     // We've already set the loaded slot to it's default value. No special processing is needed for
     // flags not in the database yet.
 }
 
 void AchievementFlag::saveSlotToDisk(unsigned int slot) {
-    controller->dbSetFlag(ach_set, getId(), slot, data_size, data[slot], sot_data[slot]);
+    // No need to spend time writing if there's no change.
+    if (was_updated == true) {
+        controller->dbSetFlag(ach_set, getId(), slot, data_size, data[slot], sot_data[slot]);
+        was_updated = false;
+    }
 }

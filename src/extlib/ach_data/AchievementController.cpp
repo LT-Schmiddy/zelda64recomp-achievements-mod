@@ -33,7 +33,7 @@ void AchievementController::setU32Flag(std::string ach_set, std::string flag_id,
     std::shared_ptr<AchievementSet> set = achievement_sets.at(ach_set);
     std::shared_ptr<AchievementFlag> flag = set->getFlag(flag_id);
 
-    flag->getValue(slot, &value);
+    flag->setValue(slot, &value);
     flag->updateAchievements(slot);
 }
 
@@ -280,7 +280,7 @@ int AchievementController::dbSetFlag(std::string ach_set, std::string flag_id, u
         PLOGE.printf("[" DB_FLAG_TABLE "] Failed SET %s (ach_set %s, slot %d): %s\n", ach_set.c_str(), flag_id.c_str(), slot, sqlite3_errmsg(db));
     }
     // sqlite3_finalize(stmt);
-
+    PLOGD.printf("[" DB_FLAG_TABLE "] SET %s (ach_set %s, slot %d): succeeded.\n", ach_set.c_str(), flag_id.c_str(), slot);
     return res;
 }
 
@@ -452,7 +452,7 @@ int AchievementController::dbMakeDiskSOTValues(unsigned int slot) {
     }
     // sqlite3_finalize(stmt);
 
-    PLOGE.printf("[" DB_FLAG_TABLE "] SOT_SAVE for slot %d succeeded\n", slot);
+    PLOGD.printf("[" DB_FLAG_TABLE "] SOT_SAVE for slot %d succeeded\n", slot);
     return res;
 }
 
@@ -479,7 +479,7 @@ int AchievementController::dbRevertDiskToSOTValues(unsigned int slot) {
     }
     // sqlite3_finalize(stmt);
 
-    PLOGE.printf("[" DB_FLAG_TABLE "] SOT_REVERT for slot %d succeeded\n", slot);
+    PLOGD.printf("[" DB_FLAG_TABLE "] SOT_REVERT for slot %d succeeded\n", slot);
     return res;
 }
 

@@ -38,6 +38,7 @@ private:
     size_t data_size = 0;
     unsigned char** data = NULL;
     unsigned char** sot_data = NULL;
+    bool was_updated = false;
 
     std::unordered_map<std::string,std::shared_ptr<AchievementWrapper>> dependent_achievements;
 
