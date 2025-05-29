@@ -187,7 +187,7 @@ int AchievementController::dbGetAchievementUnlocked(std::string ach_set, std::st
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         
         int unlocked = sqlite3_column_int(stmt, 0);
-        sqlite3_finalize(stmt);
+        // sqlite3_finalize(stmt);
         return unlocked;
     }
 
