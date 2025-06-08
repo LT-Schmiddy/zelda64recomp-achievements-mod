@@ -20,12 +20,12 @@ RECOMP_HOOK("Sram_CopySave") void pre_Sram_CopySave(FileSelectState* fileSelect2
 
 }
 
-
-
-
 RECOMP_CALLBACK("*", recomp_on_load_save) void load_achiement_flags() {
+    // We're not loading an Owl Save, do a revert anyway.
+    // This should handle rewinding from the menu, and there's no
+    // harm done if we're loading a normal SOT save.
     if (gSaveContext.save.isOwlSave == 0) {
-        AchievementNative_RevertDiskToSOTState(gSaveContext.fileNum);
+        AchievementNative_RevertToSOTState(gSaveContext.fileNum);
     }
 
     AchievementNative_ReadFlagsFromDisk(gSaveContext.fileNum);
@@ -44,12 +44,10 @@ RECOMP_CALLBACK("*", recomp_on_owl_save) void save_achiement_flags_owl() {
 }
 
 RECOMP_HOOK_RETURN("Sram_SaveEndOfCycle") void save_quickBottle_SOT() {
-    AchievementNative_WriteFlagsToDisk(gSaveContext.fileNum);
-    AchievementNative_MakeDiskSOTState(gSaveContext.fileNum);
+    AchievementNative_MakeSOTState(gSaveContext.fileNum);
 }
 
 RECOMP_CALLBACK("*", recomp_on_moon_crash) void revert_achiement_flags_mooncrash() {
-    AchievementNative_RevertDiskToSOTState(gSaveContext.fileNum);
-    AchievementNative_ReadFlagsFromDisk(gSaveContext.fileNum);
+    AchievementNative_RevertToSOTState(gSaveContext.fileNum);
 }
 

@@ -47,3 +47,13 @@ void AchievementSet::saveSlotToDisk(unsigned int slot) {
         iter.second->saveSlotToDisk(slot);
     }
 }
+void AchievementSet::makeSlotSOTData(unsigned int slot) {
+    for (auto iter : flags) {
+        iter.second->makeSlotSOTValue(slot);
+    }
+}
+void AchievementSet::revertSlotSOTData(unsigned int slot) {
+    for (auto iter : flags) {
+        iter.second->revertSlotSOTValue(slot);
+    }
+}

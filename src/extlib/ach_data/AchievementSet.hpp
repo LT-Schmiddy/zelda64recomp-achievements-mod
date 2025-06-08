@@ -23,6 +23,8 @@ public:
     void loadSlotFromDisk(unsigned int slot);
     void saveSlotToDisk(unsigned int slot);
 
+    void makeSlotSOTData(unsigned int slot);
+    void revertSlotSOTData(unsigned int slot);
 
 private:
     

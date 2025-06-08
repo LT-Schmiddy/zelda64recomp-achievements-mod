@@ -494,3 +494,13 @@ void AchievementController::saveSlotToDisk(unsigned int slot) {
     }
 }
 
+void AchievementController::makeSlotSOTData(unsigned int slot) {
+    for (auto iter : achievement_sets) {
+        iter.second->revertSlotSOTData(slot);
+    }
+}
+void AchievementController::makeSlotSOTData(unsigned int slot) {
+    for (auto iter : achievement_sets) {
+        iter.second->revertSlotSOTData(slot);
+    }
+}

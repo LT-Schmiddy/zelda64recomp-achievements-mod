@@ -70,8 +70,8 @@ RECOMP_IMPORT(".", void AchievementNative_SetU32Flag(const char* ach_set, const 
 RECOMP_IMPORT(".", Achievement* AchievementNative_GetNextAchievementUnlock());
 RECOMP_IMPORT(".", Achievement* AchievementNative_WriteFlagsToDisk(u32 slot));
 RECOMP_IMPORT(".", Achievement* AchievementNative_ReadFlagsFromDisk(u32 slot));
-RECOMP_IMPORT(".", Achievement* AchievementNative_MakeDiskSOTState(u32 slot));
-RECOMP_IMPORT(".", Achievement* AchievementNative_RevertDiskToSOTState(u32 slot));
+RECOMP_IMPORT(".", Achievement* AchievementNative_MakeSOTState(u32 slot));
+RECOMP_IMPORT(".", Achievement* AchievementNative_RevertToSOTState(u32 slot));
 #endif
 
 #ifdef __cplusplus

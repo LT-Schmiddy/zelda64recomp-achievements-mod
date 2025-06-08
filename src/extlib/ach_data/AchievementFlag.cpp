@@ -19,8 +19,6 @@ AchievementFlag::AchievementFlag(AchievementController* p_controller, std::strin
         sot_data[i] = new unsigned char[ACHIEVEMENT_FLAG_SIZE];
         loadDefaultValue(i);
         loadDefaultValueSOT(i);
-
-        // controller->dbInitFlag(ach_set, getId(), i, data_size, data[i], sot_data[i]);
     }
 }
 
@@ -98,3 +96,13 @@ void AchievementFlag::saveSlotToDisk(unsigned int slot) {
         was_updated = false;
     }
 }
+
+void AchievementFlag::makeSlotSOTValue(unsigned int slot) {
+    memcpy(sot_data[slot], data[slot], data_size);
+}
+
+void AchievementFlag::revertSlotSOTValue(unsigned int slot) {
+    memcpy(data[slot], sot_data[slot], data_size);
+}
+
+

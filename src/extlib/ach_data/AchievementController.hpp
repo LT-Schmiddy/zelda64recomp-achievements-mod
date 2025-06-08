@@ -50,11 +50,15 @@ public:
     int dbDeleteSlotFlags(unsigned int slot);
     int dbCopySlotFlags(unsigned int dst_slot, unsigned int src_slot);
 
+    // Not sure if I need these, actually:
     int dbMakeDiskSOTValues(unsigned int slot);
     int dbRevertDiskToSOTValues(unsigned int slot);
 
     void loadSlotFromDisk(unsigned int slot);
     void saveSlotToDisk(unsigned int slot);
+
+    void makeSlotSOTData(unsigned int slot);
+    void revertSlotSOTData(unsigned int slot);
 
 private:
     uint8_t* recomp_rdram = NULL;

@@ -28,6 +28,9 @@ public:
     void loadSlotFromDisk(unsigned int slot);
     void saveSlotToDisk(unsigned int slot);
 
+    void makeSlotSOTValue(unsigned int slot);
+    void revertSlotSOTValue(unsigned int slot);
+
     
 private:
     AchievementController* controller = NULL;

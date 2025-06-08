@@ -67,13 +67,13 @@ RECOMP_DLL_FUNC(AchievementNative_ReadFlagsFromDisk) {
     controller->loadSlotFromDisk(slot);
 }
 
-RECOMP_DLL_FUNC(AchievementNative_MakeDiskSOTState) {
+RECOMP_DLL_FUNC(AchievementNative_MakeSOTState) {
     unsigned int slot = RECOMP_ARG(unsigned int, 0);
-    controller->dbMakeDiskSOTValues(slot);
+    controller->makeSlotSOTData(slot);
 }
 
-RECOMP_DLL_FUNC(AchievementNative_RevertDiskToSOTState) {
+RECOMP_DLL_FUNC(AchievementNative_RevertToSOTState) {
     unsigned int slot = RECOMP_ARG(unsigned int, 0);
-    controller->dbRevertDiskToSOTValues(slot);
+    controller->revertSlotSOTData(slot);
 }
 
